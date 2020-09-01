@@ -34,13 +34,15 @@ var Analyzer = &analysis.Analyzer{
 
 type outputField struct {
 	TestFuncName string
+	ExpectStruct string
 	ExecBaseFunc string
 }
 
 type returnValue struct {
-	Name    string
-	Type    ast.Expr
-	IsError bool
+	Name     string
+	Type     ast.Expr
+	TypeName string
+	IsError  bool
 }
 
 func init() {
@@ -58,12 +60,13 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		return nil, err
 	}
 
-	of := &outputField{}
-	of.TestFuncName = genTestFuncName(funcDecl.Name.String())
 	returns, err := getReturnValues(pass, funcDecl)
 	if err != nil {
 		return nil, err
 	}
+	of := &outputField{}
+	of.TestFuncName = genTestFuncName(funcDecl.Name.String())
+	of.ExpectStruct = genExpectStruct(returns)
 	of.ExecBaseFunc, err = genExecBaseCode(funcDecl, returns)
 	if err != nil {
 		return nil, err
@@ -148,9 +151,10 @@ func getReturnValues(pass *analysis.Pass, baseFuncDecl *ast.FuncDecl) ([]*return
 			}
 
 			value := &returnValue{
-				Name:    name,
-				Type:    valueType,
-				IsError: isError,
+				Name:     name,
+				Type:     valueType,
+				TypeName: typeName,
+				IsError:  isError,
 			}
 
 			values = append(values, value)
@@ -164,9 +168,10 @@ func getReturnValues(pass *analysis.Pass, baseFuncDecl *ast.FuncDecl) ([]*return
 					nameMap[name] = 1
 				}
 				value := &returnValue{
-					Name:    name,
-					Type:    valueType,
-					IsError: isError,
+					Name:     name,
+					Type:     valueType,
+					TypeName: typeName,
+					IsError:  isError,
 				}
 
 				values = append(values, value)
@@ -177,9 +182,23 @@ func getReturnValues(pass *analysis.Pass, baseFuncDecl *ast.FuncDecl) ([]*return
 	return values, nil
 }
 
+func genExpectStruct(returns []*returnValue) string {
+	if len(returns) == 0 {
+		return ""
+	}
+	result := "type expect struct {\n"
+	for _, re := range returns {
+		result += fmt.Sprintf("%s %s\n", re.Name, re.TypeName)
+	}
+	result += "}"
+
+	return result
+}
+
 func outputTestCode(of *outputField) error {
 	testCodeTemplate := `
 func {{.TestFuncName}}(t *testing.T){
+	{{.ExpectStruct}}
 	tests := []struct{}{}
 	for _, test := range tests {
 		t.Run("LABEL", func(t *testing.T) {
@@ -192,6 +211,7 @@ func {{.TestFuncName}}(t *testing.T){
 
 	field := map[string]string{
 		"TestFuncName": of.TestFuncName,
+		"ExpectStruct": of.ExpectStruct,
 		"ExecBaseFunc": of.ExecBaseFunc,
 	}
 

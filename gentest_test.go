@@ -25,6 +25,7 @@ func TestAnalyzer(t *testing.T) {
 			Offset:  30,
 			Expected: `
 func TestF(t *testing.T) {
+
 	tests := []struct{}{}
 	for _, test := range tests {
 		t.Run("LABEL", func(t *testing.T) {
@@ -39,6 +40,9 @@ func TestF(t *testing.T) {
 			Offset:  142,
 			Expected: `
 func TestReturnInt(t *testing.T) {
+	type expect struct {
+		gotint int
+	}
 	tests := []struct{}{}
 	for _, test := range tests {
 		t.Run("LABEL", func(t *testing.T) {
@@ -53,6 +57,10 @@ func TestReturnInt(t *testing.T) {
 			Offset:  189,
 			Expected: `
 func TestReturnInts(t *testing.T) {
+	type expect struct {
+		gotint  int
+		gotint2 int
+	}
 	tests := []struct{}{}
 	for _, test := range tests {
 		t.Run("LABEL", func(t *testing.T) {
