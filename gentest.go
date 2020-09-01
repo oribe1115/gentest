@@ -39,6 +39,11 @@ type outputField struct {
 	ExecBaseFunc   string
 }
 
+type baseFuncData struct {
+	FuncDecl *ast.FuncDecl
+	Returns  []*returnValue
+}
+
 type returnValue struct {
 	Name     string
 	Type     ast.Expr
@@ -60,16 +65,19 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+	baseFunc := &baseFuncData{
+		FuncDecl: funcDecl,
+	}
 
-	returns, err := getReturnValues(pass, funcDecl)
+	err = baseFunc.getReturnValues(pass)
 	if err != nil {
 		return nil, err
 	}
 	of := &outputField{}
 	of.TestFuncName = genTestFuncName(funcDecl.Name.String())
-	of.ExpectedStruct = genExpectedStruct(returns)
-	of.TestCasesDef = genTestCasesDef(returns)
-	of.ExecBaseFunc, err = genExecBaseCode(funcDecl, returns)
+	of.ExpectedStruct = genExpectedStruct(baseFunc)
+	of.TestCasesDef = genTestCasesDef(baseFunc)
+	of.ExecBaseFunc, err = genExecBaseCode(baseFunc)
 	if err != nil {
 		return nil, err
 	}
@@ -105,12 +113,12 @@ func genTestFuncName(funcName string) string {
 	return "Test" + startWithUpper
 }
 
-func genExecBaseCode(baseFuncDecl *ast.FuncDecl, returns []*returnValue) (string, error) {
+func genExecBaseCode(bf *baseFuncData) (string, error) {
 	var result string
-	funcName := baseFuncDecl.Name.String()
+	funcName := bf.FuncDecl.Name.String()
 
 	retrunNames := make([]string, 0)
-	for _, re := range returns {
+	for _, re := range bf.Returns {
 		retrunNames = append(retrunNames, re.Name)
 	}
 	if len(retrunNames) != 0 {
@@ -121,11 +129,11 @@ func genExecBaseCode(baseFuncDecl *ast.FuncDecl, returns []*returnValue) (string
 }
 
 // あとで整理する
-func getReturnValues(pass *analysis.Pass, baseFuncDecl *ast.FuncDecl) ([]*returnValue, error) {
-	values := make([]*returnValue, 0)
-	results := baseFuncDecl.Type.Results
+func (bf *baseFuncData) getReturnValues(pass *analysis.Pass) error {
+	bf.Returns = make([]*returnValue, 0)
+	results := bf.FuncDecl.Type.Results
 	if results == nil {
-		return values, nil
+		return nil
 	}
 
 	nameMap := map[string]int{}
@@ -159,7 +167,7 @@ func getReturnValues(pass *analysis.Pass, baseFuncDecl *ast.FuncDecl) ([]*return
 				IsError:  isError,
 			}
 
-			values = append(values, value)
+			bf.Returns = append(bf.Returns, value)
 		} else {
 			for _, ident := range field.Names {
 				name := ident.Name
@@ -176,20 +184,20 @@ func getReturnValues(pass *analysis.Pass, baseFuncDecl *ast.FuncDecl) ([]*return
 					IsError:  isError,
 				}
 
-				values = append(values, value)
+				bf.Returns = append(bf.Returns, value)
 			}
 		}
 	}
 
-	return values, nil
+	return nil
 }
 
-func genExpectedStruct(returns []*returnValue) string {
-	if len(returns) == 0 {
+func genExpectedStruct(bf *baseFuncData) string {
+	if len(bf.Returns) == 0 {
 		return ""
 	}
 	result := "type expected struct {\n"
-	for _, re := range returns {
+	for _, re := range bf.Returns {
 		result += fmt.Sprintf("%s %s\n", re.Name, re.TypeName)
 	}
 	result += "}"
@@ -197,11 +205,11 @@ func genExpectedStruct(returns []*returnValue) string {
 	return result
 }
 
-func genTestCasesDef(returns []*returnValue) string {
+func genTestCasesDef(bf *baseFuncData) string {
 	result := "tests := []struct{"
 
 	var expected string
-	if len(returns) != 0 {
+	if len(bf.Returns) != 0 {
 		expected = "Expected expected"
 	}
 
