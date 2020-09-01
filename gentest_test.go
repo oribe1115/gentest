@@ -18,6 +18,6 @@ func TestAnalyzer(t *testing.T) {
 	testdata := analysistest.TestData()
 	analysistest.Run(t, testdata, gentest.Analyzer, "a")
 
-	expected := "\n\tfunc TestF(){t *testing.T}\n\t"
+	expected := "\n\tfunc TestF() { t * testing.T }\n\t"
 	assert.Equal(t, expected, buffer.String())
 }

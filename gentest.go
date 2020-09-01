@@ -1,8 +1,10 @@
 package gentest
 
 import (
+	"bytes"
 	"fmt"
 	"go/ast"
+	"go/format"
 	"io"
 	"os"
 	"strings"
@@ -83,7 +85,7 @@ func genTestFuncName(funcName string) string {
 	return "Test" + startWithUpper
 }
 
-func outputTestCode(of *outputField) {
+func outputTestCode(of *outputField) error {
 	testCodeTemplate := `
 	{{define "base"}}
 	func {{.TestFuncName}}(){t *testing.T}
@@ -94,6 +96,19 @@ func outputTestCode(of *outputField) {
 		"TestFuncName": of.TestFuncName,
 	}
 
-	t, _ := template.New("base").Parse(testCodeTemplate)
-	t.Execute(writer, field)
+	t, err := template.New("base").Parse(testCodeTemplate)
+	if err != nil {
+		return err
+	}
+	buffer := &bytes.Buffer{}
+	err = t.Execute(buffer, field)
+	if err != nil {
+		return err
+	}
+	result, err := format.Source([]byte(buffer.Bytes()))
+	if err != nil {
+		return err
+	}
+	fprint(string(result))
+	return nil
 }
