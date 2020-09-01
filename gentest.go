@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"go/ast"
 	"go/format"
+	"go/types"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -35,6 +37,12 @@ type outputField struct {
 	ExecBaseFunc string
 }
 
+type returnValue struct {
+	Name    string
+	Type    ast.Expr
+	IsError bool
+}
+
 func init() {
 	writer = os.Stdout
 	Analyzer.Flags.IntVar(&offset, "offset", offset, "offset")
@@ -52,7 +60,11 @@ func run(pass *analysis.Pass) (interface{}, error) {
 
 	of := &outputField{}
 	of.TestFuncName = genTestFuncName(funcDecl.Name.String())
-	of.ExecBaseFunc, err = genExecBaseCode(funcDecl)
+	returns, err := getReturnValues(pass, funcDecl)
+	if err != nil {
+		return nil, err
+	}
+	of.ExecBaseFunc, err = genExecBaseCode(funcDecl, returns)
 	if err != nil {
 		return nil, err
 	}
@@ -88,11 +100,81 @@ func genTestFuncName(funcName string) string {
 	return "Test" + startWithUpper
 }
 
-func genExecBaseCode(baseFuncDecl *ast.FuncDecl) (string, error) {
+func genExecBaseCode(baseFuncDecl *ast.FuncDecl, returns []*returnValue) (string, error) {
 	var result string
 	funcName := baseFuncDecl.Name.String()
+
+	retrunNames := make([]string, 0)
+	for _, re := range returns {
+		retrunNames = append(retrunNames, re.Name)
+	}
+	if len(retrunNames) != 0 {
+		result += strings.Join(retrunNames, ",") + ":="
+	}
 	result += fmt.Sprintf("%s()", funcName)
 	return result, nil
+}
+
+// あとで整理する
+func getReturnValues(pass *analysis.Pass, baseFuncDecl *ast.FuncDecl) ([]*returnValue, error) {
+	values := make([]*returnValue, 0)
+	results := baseFuncDecl.Type.Results
+	if results == nil {
+		return values, nil
+	}
+
+	nameMap := map[string]int{}
+	errType := types.Universe.Lookup("error").Type()
+
+	for _, field := range results.List {
+		var typeName string
+		var isError bool
+		valueType := field.Type
+		switch valueType := field.Type.(type) {
+		case *ast.Ident:
+			tv, _ := pass.TypesInfo.Types[valueType]
+			isError = types.Identical(tv.Type, errType)
+			typeName = tv.Type.String()
+		}
+
+		if len(field.Names) == 0 {
+			name := "got" + typeName
+
+			if count, exist := nameMap[name]; exist {
+				name += strconv.Itoa(count + 1)
+				nameMap[name]++
+			} else {
+				nameMap[name] = 1
+			}
+
+			value := &returnValue{
+				Name:    name,
+				Type:    valueType,
+				IsError: isError,
+			}
+
+			values = append(values, value)
+		} else {
+			for _, ident := range field.Names {
+				name := ident.Name
+				if count, exist := nameMap[name]; exist {
+					name += strconv.Itoa(count + 1)
+					nameMap[name]++
+				} else {
+					nameMap[name] = 1
+				}
+				value := &returnValue{
+					Name:    name,
+					Type:    valueType,
+					IsError: isError,
+				}
+
+				values = append(values, value)
+			}
+		}
+	}
+
+	return values, nil
 }
 
 func outputTestCode(of *outputField) error {

@@ -9,3 +9,7 @@ func f() {
 func returnInt() int {
 	return 0
 }
+
+func returnInts() (int, int) {
+	return 0, 1
+}

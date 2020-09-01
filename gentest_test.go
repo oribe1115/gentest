@@ -42,7 +42,21 @@ func TestReturnInt(t *testing.T) {
 	tests := []struct{}{}
 	for _, test := range tests {
 		t.Run("LABEL", func(t *testing.T) {
-			returnInt()
+			gotint := returnInt()
+		})
+	}
+}`,
+		},
+		{
+			Label:   "multi int func",
+			TestDir: "a",
+			Offset:  189,
+			Expected: `
+func TestReturnInts(t *testing.T) {
+	tests := []struct{}{}
+	for _, test := range tests {
+		t.Run("LABEL", func(t *testing.T) {
+			gotint, gotint2 := returnInts()
 		})
 	}
 }`,
