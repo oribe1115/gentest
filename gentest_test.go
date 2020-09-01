@@ -27,6 +27,9 @@ func TestAnalyzer(t *testing.T) {
 func TestF(t *testing.T) {
 	tests := []struct{}{}
 	for _, test := range tests {
+		t.Run("LABEL", func(t *testing.T) {
+			f()
+		})
 	}
 }`,
 		},
@@ -38,6 +41,9 @@ func TestF(t *testing.T) {
 func TestReturnInt(t *testing.T) {
 	tests := []struct{}{}
 	for _, test := range tests {
+		t.Run("LABEL", func(t *testing.T) {
+			returnInt()
+		})
 	}
 }`,
 		},

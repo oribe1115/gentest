@@ -32,6 +32,7 @@ var Analyzer = &analysis.Analyzer{
 
 type outputField struct {
 	TestFuncName string
+	ExecBaseFunc string
 }
 
 func init() {
@@ -51,9 +52,11 @@ func run(pass *analysis.Pass) (interface{}, error) {
 
 	of := &outputField{}
 	of.TestFuncName = genTestFuncName(funcDecl.Name.String())
+	of.ExecBaseFunc, err = genExecBaseCode(funcDecl)
+	if err != nil {
+		return nil, err
+	}
 	outputTestCode(of)
-
-	_, _ = findTargetFunc(pass)
 
 	return nil, nil
 }
@@ -85,17 +88,29 @@ func genTestFuncName(funcName string) string {
 	return "Test" + startWithUpper
 }
 
+func genExecBaseCode(baseFuncDecl *ast.FuncDecl) (string, error) {
+	var result string
+	funcName := baseFuncDecl.Name.String()
+	result += fmt.Sprintf("%s()", funcName)
+	return result, nil
+}
+
 func outputTestCode(of *outputField) error {
 	testCodeTemplate := `
 func {{.TestFuncName}}(t *testing.T){
 	tests := []struct{}{}
-	for _, test := range tests {}
+	for _, test := range tests {
+		t.Run("LABEL", func(t *testing.T) {
+			{{.ExecBaseFunc}}
+		})
+	}
 }`
 
 	testCodeTemplate = "{{define \"base\"}}" + testCodeTemplate + "{{end}}"
 
 	field := map[string]string{
 		"TestFuncName": of.TestFuncName,
+		"ExecBaseFunc": of.ExecBaseFunc,
 	}
 
 	t, err := template.New("base").Parse(testCodeTemplate)
