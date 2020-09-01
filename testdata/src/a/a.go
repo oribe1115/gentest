@@ -5,3 +5,7 @@ func f() {
 	var gopher int
 	print(gopher)
 }
+
+func returnInt() int {
+	return 0
+}

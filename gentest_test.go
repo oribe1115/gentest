@@ -34,6 +34,17 @@ func TestF(t *testing.T) {
 	}
 }`,
 		},
+		{
+			Label:   "simple int func",
+			TestDir: "a",
+			Offset:  142,
+			Expected: `
+func TestReturnInt(t *testing.T) {
+	tests := []struct{}{}
+	for _, test := range tests {
+	}
+}`,
+		},
 	}
 
 	for _, test := range tests {
