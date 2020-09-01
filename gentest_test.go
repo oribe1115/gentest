@@ -24,10 +24,15 @@ func TestAnalyzer(t *testing.T) {
 		Expected string
 	}{
 		{
-			Label:    "simple func",
-			TestDir:  "a",
-			Offset:   30,
-			Expected: "\n\tfunc TestF() { t * testing.T }\n\t",
+			Label:   "simple func",
+			TestDir: "a",
+			Offset:  30,
+			Expected: `
+func TestF(t *testing.T) {
+	tests := []struct{}{}
+	for _, test := range tests {
+	}
+}`,
 		},
 	}
 

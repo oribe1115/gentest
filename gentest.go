@@ -87,10 +87,12 @@ func genTestFuncName(funcName string) string {
 
 func outputTestCode(of *outputField) error {
 	testCodeTemplate := `
-	{{define "base"}}
-	func {{.TestFuncName}}(){t *testing.T}
-	{{end}}
-	`
+func {{.TestFuncName}}(t *testing.T){
+	tests := []struct{}{}
+	for _, test := range tests {}
+}`
+
+	testCodeTemplate = "{{define \"base\"}}" + testCodeTemplate + "{{end}}"
 
 	field := map[string]string{
 		"TestFuncName": of.TestFuncName,
