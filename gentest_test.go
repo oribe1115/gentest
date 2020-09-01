@@ -2,7 +2,6 @@ package gentest_test
 
 import (
 	"bytes"
-	"strconv"
 	"testing"
 
 	"github.com/oribe1115/gentest"
@@ -12,9 +11,6 @@ import (
 
 // TestAnalyzer is a test for Analyzer.
 func TestAnalyzer(t *testing.T) {
-	buffer := &bytes.Buffer{}
-	gentest.SetWriter(buffer)
-
 	testdata := analysistest.TestData()
 
 	tests := []struct {
@@ -49,9 +45,9 @@ func TestReturnInt(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Label, func(t *testing.T) {
-			offset := strconv.Itoa(test.Offset)
-			gentest.Analyzer.Flags.Set("offset", offset)
-			gentest.ParseFlags() // flag redefined: offsetでパニック
+			buffer := &bytes.Buffer{}
+			gentest.SetWriter(buffer)
+			gentest.SetOffset(test.Offset)
 			analysistest.Run(t, testdata, gentest.Analyzer, test.TestDir)
 			assert.Equal(t, test.Expected, buffer.String())
 		})

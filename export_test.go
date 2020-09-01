@@ -1,11 +1,13 @@
 package gentest
 
-import "io"
+import (
+	"io"
+)
 
 func SetWriter(testWriter io.Writer) {
 	writer = testWriter
 }
 
-func ParseFlags() {
-	Analyzer.Flags.IntVar(&offset, "offset", offset, "offset")
+func SetOffset(o int) {
+	offset = o
 }
