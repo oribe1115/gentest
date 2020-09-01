@@ -16,6 +16,7 @@ import (
 const doc = "gentest is ..."
 
 var writer io.Writer
+var funcName string // -func flag
 
 // Analyzer is ...
 var Analyzer = &analysis.Analyzer{
@@ -33,6 +34,7 @@ type outputField struct {
 
 func init() {
 	writer = os.Stdout
+	Analyzer.Flags.StringVar(&funcName, "func", "funcName", "fuction name for generateing test code")
 }
 
 func fprint(a ...interface{}) {
@@ -50,7 +52,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	})
 
 	of := &outputField{}
-	of.TestFuncName = genTestFuncName("hoge")
+	of.TestFuncName = genTestFuncName(funcName)
 	outputTestCode(of)
 
 	return nil, nil

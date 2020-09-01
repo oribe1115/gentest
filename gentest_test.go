@@ -13,6 +13,7 @@ import (
 func TestAnalyzer(t *testing.T) {
 	buffer := &bytes.Buffer{}
 	gentest.SetWriter(buffer)
+	gentest.Analyzer.Flags.Set("func", "f")
 
 	testdata := analysistest.TestData()
 	analysistest.Run(t, testdata, gentest.Analyzer, "a")
