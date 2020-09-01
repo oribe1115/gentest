@@ -33,9 +33,10 @@ var Analyzer = &analysis.Analyzer{
 }
 
 type outputField struct {
-	TestFuncName string
-	ExpectStruct string
-	ExecBaseFunc string
+	TestFuncName   string
+	ExpectedStruct string
+	TestCasesDef   string
+	ExecBaseFunc   string
 }
 
 type returnValue struct {
@@ -66,7 +67,8 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	}
 	of := &outputField{}
 	of.TestFuncName = genTestFuncName(funcDecl.Name.String())
-	of.ExpectStruct = genExpectStruct(returns)
+	of.ExpectedStruct = genExpectedStruct(returns)
+	of.TestCasesDef = genTestCasesDef(returns)
 	of.ExecBaseFunc, err = genExecBaseCode(funcDecl, returns)
 	if err != nil {
 		return nil, err
@@ -182,11 +184,11 @@ func getReturnValues(pass *analysis.Pass, baseFuncDecl *ast.FuncDecl) ([]*return
 	return values, nil
 }
 
-func genExpectStruct(returns []*returnValue) string {
+func genExpectedStruct(returns []*returnValue) string {
 	if len(returns) == 0 {
 		return ""
 	}
-	result := "type expect struct {\n"
+	result := "type expected struct {\n"
 	for _, re := range returns {
 		result += fmt.Sprintf("%s %s\n", re.Name, re.TypeName)
 	}
@@ -195,11 +197,25 @@ func genExpectStruct(returns []*returnValue) string {
 	return result
 }
 
+func genTestCasesDef(returns []*returnValue) string {
+	result := "tests := []struct{"
+
+	var expected string
+	if len(returns) != 0 {
+		expected = "Expected expected"
+	}
+
+	result += strings.Join([]string{expected}, ",")
+
+	result += "}{}"
+	return result
+}
+
 func outputTestCode(of *outputField) error {
 	testCodeTemplate := `
 func {{.TestFuncName}}(t *testing.T){
-	{{.ExpectStruct}}
-	tests := []struct{}{}
+	{{.ExpectedStruct}}
+	{{.TestCasesDef}}
 	for _, test := range tests {
 		t.Run("LABEL", func(t *testing.T) {
 			{{.ExecBaseFunc}}
@@ -210,9 +226,10 @@ func {{.TestFuncName}}(t *testing.T){
 	testCodeTemplate = "{{define \"base\"}}" + testCodeTemplate + "{{end}}"
 
 	field := map[string]string{
-		"TestFuncName": of.TestFuncName,
-		"ExpectStruct": of.ExpectStruct,
-		"ExecBaseFunc": of.ExecBaseFunc,
+		"TestFuncName":   of.TestFuncName,
+		"ExpectedStruct": of.ExpectedStruct,
+		"TestCasesDef":   of.TestCasesDef,
+		"ExecBaseFunc":   of.ExecBaseFunc,
 	}
 
 	t, err := template.New("base").Parse(testCodeTemplate)
