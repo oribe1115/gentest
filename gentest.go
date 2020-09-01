@@ -69,7 +69,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		FuncDecl: funcDecl,
 	}
 
-	err = baseFunc.getvarFields(pass)
+	err = baseFunc.setReturns(pass)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func genExecBaseCode(bf *baseFuncData) (string, error) {
 }
 
 // あとで整理する
-func (bf *baseFuncData) getvarFields(pass *analysis.Pass) error {
+func (bf *baseFuncData) setReturns(pass *analysis.Pass) error {
 	bf.Returns = make([]*varField, 0)
 	results := bf.FuncDecl.Type.Results
 	if results == nil {
