@@ -41,10 +41,10 @@ type outputField struct {
 
 type baseFuncData struct {
 	FuncDecl *ast.FuncDecl
-	Returns  []*returnValue
+	Returns  []*varField
 }
 
-type returnValue struct {
+type varField struct {
 	Name     string
 	Type     ast.Expr
 	TypeName string
@@ -69,7 +69,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		FuncDecl: funcDecl,
 	}
 
-	err = baseFunc.getReturnValues(pass)
+	err = baseFunc.getvarFields(pass)
 	if err != nil {
 		return nil, err
 	}
@@ -129,8 +129,8 @@ func genExecBaseCode(bf *baseFuncData) (string, error) {
 }
 
 // あとで整理する
-func (bf *baseFuncData) getReturnValues(pass *analysis.Pass) error {
-	bf.Returns = make([]*returnValue, 0)
+func (bf *baseFuncData) getvarFields(pass *analysis.Pass) error {
+	bf.Returns = make([]*varField, 0)
 	results := bf.FuncDecl.Type.Results
 	if results == nil {
 		return nil
@@ -160,7 +160,7 @@ func (bf *baseFuncData) getReturnValues(pass *analysis.Pass) error {
 				nameMap[name] = 1
 			}
 
-			value := &returnValue{
+			value := &varField{
 				Name:     name,
 				Type:     valueType,
 				TypeName: typeName,
@@ -177,7 +177,7 @@ func (bf *baseFuncData) getReturnValues(pass *analysis.Pass) error {
 				} else {
 					nameMap[name] = 1
 				}
-				value := &returnValue{
+				value := &varField{
 					Name:     name,
 					Type:     valueType,
 					TypeName: typeName,
