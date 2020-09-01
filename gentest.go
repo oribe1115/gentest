@@ -5,6 +5,8 @@ import (
 	"go/ast"
 	"io"
 	"os"
+	"strings"
+	"text/template"
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
@@ -25,6 +27,10 @@ var Analyzer = &analysis.Analyzer{
 	},
 }
 
+type outputField struct {
+	TestFuncName string
+}
+
 func init() {
 	writer = os.Stdout
 }
@@ -43,7 +49,36 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	inspect.Preorder(nodeFilter, func(n ast.Node) {
 	})
 
-	fprint("hoge\n")
+	of := &outputField{}
+	of.TestFuncName = genTestFuncName("hoge")
+	outputTestCode(of)
 
 	return nil, nil
+}
+
+func findTargetFunc(pass *analysis.Pass) (*ast.FuncDecl, error) {
+	return nil, nil
+}
+
+func genTestFuncName(funcName string) string {
+	startWithUpper := strings.ToUpper(string(funcName[0]))
+	if len(funcName) > 1 {
+		startWithUpper += funcName[1:]
+	}
+	return "Test" + startWithUpper
+}
+
+func outputTestCode(of *outputField) {
+	testCodeTemplate := `
+	{{define "base"}}
+	func {{.TestFuncName}}(){t *testing.T}
+	{{end}}
+	`
+
+	field := map[string]string{
+		"TestFuncName": of.TestFuncName,
+	}
+
+	t, _ := template.New("base").Parse(testCodeTemplate)
+	t.Execute(writer, field)
 }
