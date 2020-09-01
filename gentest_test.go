@@ -51,6 +51,7 @@ func TestReturnInt(t *testing.T) {
 		t.Run(test.Label, func(t *testing.T) {
 			offset := strconv.Itoa(test.Offset)
 			gentest.Analyzer.Flags.Set("offset", offset)
+			gentest.ParseFlags() // flag redefined: offsetでパニック
 			analysistest.Run(t, testdata, gentest.Analyzer, test.TestDir)
 			assert.Equal(t, test.Expected, buffer.String())
 		})
