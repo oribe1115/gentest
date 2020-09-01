@@ -3,7 +3,6 @@ package gentest
 import (
 	"fmt"
 	"go/ast"
-	"go/token"
 	"io"
 	"os"
 	"strings"
@@ -11,13 +10,13 @@ import (
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
-	"golang.org/x/tools/go/ast/inspector"
 )
 
 const doc = "gentest is ..."
 
 var writer io.Writer
-var funcName string // -func flag
+var fileName string // -file flag
+var offset int      // -offset flag
 
 // Analyzer is ...
 var Analyzer = &analysis.Analyzer{
@@ -35,7 +34,7 @@ type outputField struct {
 
 func init() {
 	writer = os.Stdout
-	Analyzer.Flags.StringVar(&funcName, "func", "funcName", "fuction name for generateing test code")
+	Analyzer.Flags.IntVar(&offset, "offset", offset, "offset")
 }
 
 func fprint(a ...interface{}) {
@@ -43,17 +42,13 @@ func fprint(a ...interface{}) {
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
-	inspect := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
-
-	nodeFilter := []ast.Node{
-		(*ast.Ident)(nil),
+	funcDecl, err := findTargetFunc(pass)
+	if err != nil {
+		return nil, err
 	}
 
-	inspect.Preorder(nodeFilter, func(n ast.Node) {
-	})
-
 	of := &outputField{}
-	of.TestFuncName = genTestFuncName(funcName)
+	of.TestFuncName = genTestFuncName(funcDecl.Name.String())
 	outputTestCode(of)
 
 	_, _ = findTargetFunc(pass)
@@ -63,26 +58,21 @@ func run(pass *analysis.Pass) (interface{}, error) {
 
 func findTargetFunc(pass *analysis.Pass) (*ast.FuncDecl, error) {
 	for _, file := range pass.Files {
-		fmt.Printf("filename: %s\n", file.Name.String())
-		token.NewFileSet()
-
 		for _, decl := range file.Decls {
 			funcDecl, _ := decl.(*ast.FuncDecl)
 			if funcDecl == nil {
 				continue
 			}
 
-			fmt.Println(funcDecl.Name.String())
-
 			blockStmt := funcDecl.Body
 			lbrecePosition := pass.Fset.Position(blockStmt.Lbrace)
-			fmt.Printf("lbrace: %d, line: %d\n", lbrecePosition.Offset, lbrecePosition.Line)
 			rbrecePosition := pass.Fset.Position(blockStmt.Rbrace)
-			fmt.Printf("rbrace: %d, line: %d\n", rbrecePosition.Offset, rbrecePosition.Line)
-
+			if lbrecePosition.Offset <= offset && offset <= rbrecePosition.Offset {
+				return funcDecl, nil
+			}
 		}
 	}
-	return nil, nil
+	return nil, fmt.Errorf("not found function with offset %d", offset)
 }
 
 func genTestFuncName(funcName string) string {

@@ -13,11 +13,11 @@ import (
 func TestAnalyzer(t *testing.T) {
 	buffer := &bytes.Buffer{}
 	gentest.SetWriter(buffer)
-	gentest.Analyzer.Flags.Set("func", "f")
+	gentest.Analyzer.Flags.Set("offset", "30")
 
 	testdata := analysistest.TestData()
 	analysistest.Run(t, testdata, gentest.Analyzer, "a")
 
-	expected := "hoge\n"
+	expected := "\n\tfunc TestF(){t *testing.T}\n\t"
 	assert.Equal(t, expected, buffer.String())
 }
