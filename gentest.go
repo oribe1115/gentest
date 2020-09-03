@@ -40,13 +40,14 @@ type outputField struct {
 }
 
 type baseFuncData struct {
-	FuncDecl *ast.FuncDecl
-	Returns  []*varField
+	FuncDecl  *ast.FuncDecl
+	Signature *types.Signature
+	Returns   []*varField
 }
 
 type varField struct {
 	Name     string
-	Type     ast.Expr
+	Type     types.Type
 	TypeName string
 	IsError  bool
 }
@@ -67,6 +68,11 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	}
 	baseFunc := &baseFuncData{
 		FuncDecl: funcDecl,
+	}
+
+	err = baseFunc.setSignature(pass)
+	if err != nil {
+		return nil, err
 	}
 
 	err = baseFunc.setReturns(pass)
@@ -128,66 +134,64 @@ func genExecBaseCode(bf *baseFuncData) (string, error) {
 	return result, nil
 }
 
-// あとで整理する
-func (bf *baseFuncData) setReturns(pass *analysis.Pass) error {
-	bf.Returns = make([]*varField, 0)
-	results := bf.FuncDecl.Type.Results
-	if results == nil {
-		return nil
+func (bf *baseFuncData) setSignature(pass *analysis.Pass) error {
+	obj, _ := pass.TypesInfo.ObjectOf(bf.FuncDecl.Name).(*types.Func)
+	if obj == nil {
+		return fmt.Errorf("faild to find object for  FucDecl")
+	}
+	sig, _ := obj.Type().(*types.Signature)
+	if sig == nil {
+		return fmt.Errorf("faild to assign types.Func to types.Signature")
 	}
 
+	bf.Signature = sig
+
+	return nil
+}
+
+func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, error) {
+	varFields := make([]*varField, 0)
 	nameMap := map[string]int{}
 	errType := types.Universe.Lookup("error").Type()
 
-	for _, field := range results.List {
-		var typeName string
-		var isError bool
-		valueType := field.Type
-		switch valueType := field.Type.(type) {
-		case *ast.Ident:
-			tv, _ := pass.TypesInfo.Types[valueType]
-			isError = types.Identical(tv.Type, errType)
-			typeName = tv.Type.String()
+	for i := 0; i < tuple.Len(); i++ {
+		v := tuple.At(i)
+		name := v.Name()
+		if name == "" {
+			name = v.Type().String()
 		}
 
-		if len(field.Names) == 0 {
-			name := "got" + typeName
+		name = prefix + name
 
-			if count, exist := nameMap[name]; exist {
-				name += strconv.Itoa(count + 1)
-				nameMap[name]++
-			} else {
-				nameMap[name] = 1
-			}
-
-			value := &varField{
-				Name:     name,
-				Type:     valueType,
-				TypeName: typeName,
-				IsError:  isError,
-			}
-
-			bf.Returns = append(bf.Returns, value)
+		if count, exist := nameMap[name]; exist {
+			name += strconv.Itoa(count + 1)
+			nameMap[name]++
 		} else {
-			for _, ident := range field.Names {
-				name := ident.Name
-				if count, exist := nameMap[name]; exist {
-					name += strconv.Itoa(count + 1)
-					nameMap[name]++
-				} else {
-					nameMap[name] = 1
-				}
-				value := &varField{
-					Name:     name,
-					Type:     valueType,
-					TypeName: typeName,
-					IsError:  isError,
-				}
-
-				bf.Returns = append(bf.Returns, value)
-			}
+			nameMap[name] = 1
 		}
+
+		isError := types.AssignableTo(v.Type(), errType)
+
+		value := &varField{
+			Name:     name,
+			Type:     v.Type(),
+			TypeName: v.Type().String(),
+			IsError:  isError,
+		}
+
+		varFields = append(varFields, value)
 	}
+
+	return varFields, nil
+}
+
+func (bf *baseFuncData) setReturns(pass *analysis.Pass) error {
+	returns, err := tupleToVarFields(bf.Signature.Results(), "got")
+	if err != nil {
+		return err
+	}
+
+	bf.Returns = returns
 
 	return nil
 }
