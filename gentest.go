@@ -174,12 +174,12 @@ func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, int) {
 		var typeString string
 		switch vType := v.Type().(type) {
 		case *types.Array:
-			typeString = "[]" + vType.Elem().String()
+			typeString = vType.String()
 			if name == "" {
 				name = vType.Elem().String() + "List"
 			}
 		case *types.Slice:
-			typeString = "[]" + vType.Elem().String()
+			typeString = vType.String()
 			if name == "" {
 				name = vType.Elem().String() + "List"
 			}
