@@ -306,7 +306,7 @@ func TestMyStructFunc(t *testing.T) {
 		ms b.myStruct
 	}
 	type expected struct {
-		gotbmyStruct b.myStruct
+		gotmyStruct b.myStruct
 	}
 	tests := []struct {
 		Label    string
@@ -315,9 +315,9 @@ func TestMyStructFunc(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Label, func(t *testing.T) {
-			gotbmyStruct := myStructFunc(test.Input.ms)
+			gotmyStruct := myStructFunc(test.Input.ms)
 
-			assert.Equal(t, test.Expected.gotbmyStruct, gotbmyStruct)
+			assert.Equal(t, test.Expected.gotmyStruct, gotmyStruct)
 		})
 	}
 }`,
@@ -325,14 +325,14 @@ func TestMyStructFunc(t *testing.T) {
 		{
 			Label:       "struct func",
 			TestPackage: "c",
-			Offset:      38,
+			Offset:      57,
 			Expected: `
 func TestStructFunc(t *testing.T) {
 	type input struct {
 		input context.Context
 	}
 	type expected struct {
-		gotcontextContext context.Context
+		gotcontext context.Context
 	}
 	tests := []struct {
 		Label    string
@@ -341,9 +341,35 @@ func TestStructFunc(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Label, func(t *testing.T) {
-			gotcontextContext := structFunc(test.Input.input)
+			gotcontext := structFunc(test.Input.input)
 
-			assert.Equal(t, test.Expected.gotcontextContext, gotcontextContext)
+			assert.Equal(t, test.Expected.gotcontext, gotcontext)
+		})
+	}
+}`,
+		},
+		{
+			Label:       "interface func",
+			TestPackage: "c",
+			Offset:      129,
+			Expected: `
+func TestInterfaceFunc(t *testing.T) {
+	type input struct {
+		input http.Handler
+	}
+	type expected struct {
+		gothandler http.Handler
+	}
+	tests := []struct {
+		Label    string
+		Input    input
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Label, func(t *testing.T) {
+			gothandler := interfaceFunc(test.Input.input)
+
+			assert.Equal(t, test.Expected.gothandler, gothandler)
 		})
 	}
 }`,
