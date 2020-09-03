@@ -79,6 +79,29 @@ func TestReturnInts(t *testing.T) {
 	}
 }`,
 		},
+		{
+			Label:   "int and error func",
+			TestDir: "a",
+			Offset:  244,
+			Expected: `
+func TestReturnIntError(t *testing.T) {
+	type expected struct {
+		gotint   int
+		goterror error
+	}
+	tests := []struct {
+		Label    string
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Label, func(t *testing.T) {
+			gotint, goterror := returnIntError()
+			assert.Equal(t, test.Expected.gotint, gotint)
+			assert.Equal(t, test.Expected.goterror, goterror)
+		})
+	}
+}`,
+		},
 	}
 
 	for _, test := range tests {

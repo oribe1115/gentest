@@ -13,3 +13,7 @@ func returnInt() int {
 func returnInts() (int, int) {
 	return 0, 1
 }
+
+func returnIntError() (int, error) {
+	return 0, nil
+}
