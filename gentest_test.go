@@ -51,6 +51,7 @@ func TestReturnInt(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Label, func(t *testing.T) {
 			gotint := returnInt()
+
 			assert.Equal(t, test.Expected.gotint, gotint)
 		})
 	}
@@ -73,6 +74,7 @@ func TestReturnInts(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Label, func(t *testing.T) {
 			gotint, gotint2 := returnInts()
+
 			assert.Equal(t, test.Expected.gotint, gotint)
 			assert.Equal(t, test.Expected.gotint2, gotint2)
 		})
@@ -92,12 +94,20 @@ func TestReturnIntError(t *testing.T) {
 	tests := []struct {
 		Label    string
 		Expected expected
+		IsError  bool
 	}{}
 	for _, test := range tests {
 		t.Run(test.Label, func(t *testing.T) {
 			gotint, goterror := returnIntError()
+
+			if test.Expected.IsError {
+				assert.Error(t, goterror)
+				return
+			} else {
+				assert.NoError(t, goterror)
+			}
+
 			assert.Equal(t, test.Expected.gotint, gotint)
-			assert.Equal(t, test.Expected.goterror, goterror)
 		})
 	}
 }`,

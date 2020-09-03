@@ -37,13 +37,14 @@ type outputField struct {
 	ExpectedStruct string
 	TestCasesDef   string
 	ExecBaseFunc   string
-	AssertEqual    string
+	Asserts        string
 }
 
 type baseFuncData struct {
-	FuncDecl  *ast.FuncDecl
-	Signature *types.Signature
-	Results   []*varField
+	FuncDecl         *ast.FuncDecl
+	Signature        *types.Signature
+	Results          []*varField
+	ResultErrorCount int
 }
 
 type varField struct {
@@ -76,16 +77,14 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		return nil, err
 	}
 
-	err = baseFunc.setReturns(pass)
-	if err != nil {
-		return nil, err
-	}
+	baseFunc.setReturns(pass)
+
 	of := &outputField{}
 	of.TestFuncName = genTestFuncName(funcDecl.Name.String())
 	of.ExpectedStruct = genExpectedStruct(baseFunc)
 	of.TestCasesDef = genTestCasesDef(baseFunc)
 	of.ExecBaseFunc, err = genExecBaseCode(baseFunc)
-	of.AssertEqual = genAssertEqual(baseFunc)
+	of.Asserts = genAsserts(baseFunc)
 	if err != nil {
 		return nil, err
 	}
@@ -151,10 +150,11 @@ func (bf *baseFuncData) setSignature(pass *analysis.Pass) error {
 	return nil
 }
 
-func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, error) {
+func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, int) {
 	varFields := make([]*varField, 0)
 	nameMap := map[string]int{}
 	errType := types.Universe.Lookup("error").Type()
+	errCount := 0
 
 	for i := 0; i < tuple.Len(); i++ {
 		v := tuple.At(i)
@@ -173,6 +173,9 @@ func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, error) {
 		}
 
 		isError := types.AssignableTo(v.Type(), errType)
+		if isError {
+			errCount++
+		}
 
 		value := &varField{
 			Name:     name,
@@ -184,18 +187,11 @@ func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, error) {
 		varFields = append(varFields, value)
 	}
 
-	return varFields, nil
+	return varFields, errCount
 }
 
-func (bf *baseFuncData) setReturns(pass *analysis.Pass) error {
-	results, err := tupleToVarFields(bf.Signature.Results(), "got")
-	if err != nil {
-		return err
-	}
-
-	bf.Results = results
-
-	return nil
+func (bf *baseFuncData) setReturns(pass *analysis.Pass) {
+	bf.Results, bf.ResultErrorCount = tupleToVarFields(bf.Signature.Results(), "got")
 }
 
 func genExpectedStruct(bf *baseFuncData) string {
@@ -221,16 +217,35 @@ func genTestCasesDef(bf *baseFuncData) string {
 		elements = append(elements, expected)
 	}
 
-	return "tests := []struct{" + strings.Join(elements, "\n") + "}{}"
-}
-func genAssertEqual(be *baseFuncData) string {
-	assrts := make([]string, 0)
-	for _, v := range be.Results {
-		as := fmt.Sprintf("assert.Equal(t, test.Expected.%s, %s)", v.Name, v.Name)
-		assrts = append(assrts, as)
+	if bf.ResultErrorCount != 0 {
+		isErr := "IsError bool"
+		elements = append(elements, isErr)
 	}
 
-	return strings.Join(assrts, "\n")
+	return "tests := []struct{" + strings.Join(elements, "\n") + "}{}"
+}
+func genAsserts(be *baseFuncData) string {
+	checkErrs := make([]string, 0)
+	equals := make([]string, 0)
+
+	for _, v := range be.Results {
+		if v.IsError {
+			checkErr := fmt.Sprintf(`
+			if test.Expected.IsError {
+				assert.Error(t, %s)
+				return
+			} else {
+				assert.NoError(t, %s)
+			}
+			`, v.Name, v.Name)
+			checkErrs = append(checkErrs, checkErr)
+		} else {
+			eq := fmt.Sprintf("assert.Equal(t, test.Expected.%s, %s)", v.Name, v.Name)
+			equals = append(equals, eq)
+		}
+	}
+
+	return strings.Join(checkErrs, "") + "\n" + strings.Join(equals, "\n")
 }
 
 func outputTestCode(of *outputField) error {
@@ -241,7 +256,7 @@ func {{.TestFuncName}}(t *testing.T){
 	for _, test := range tests {
 		t.Run(test.Label, func(t *testing.T) {
 			{{.ExecBaseFunc}}
-			{{.AssertEqual}}
+			{{.Asserts}}
 		})
 	}
 }`
@@ -253,7 +268,7 @@ func {{.TestFuncName}}(t *testing.T){
 		"ExpectedStruct": of.ExpectedStruct,
 		"TestCasesDef":   of.TestCasesDef,
 		"ExecBaseFunc":   of.ExecBaseFunc,
-		"AssertEqual":    of.AssertEqual,
+		"Asserts":        of.Asserts,
 	}
 
 	t, err := template.New("base").Parse(testCodeTemplate)
