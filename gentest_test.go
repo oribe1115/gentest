@@ -322,6 +322,32 @@ func TestMyStructFunc(t *testing.T) {
 	}
 }`,
 		},
+		{
+			Label:       "struct func",
+			TestPackage: "c",
+			Offset:      38,
+			Expected: `
+func TestStructFunc(t *testing.T) {
+	type input struct {
+		input context.Context
+	}
+	type expected struct {
+		gotcontextContext context.Context
+	}
+	tests := []struct {
+		Label    string
+		Input    input
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Label, func(t *testing.T) {
+			gotcontextContext := structFunc(test.Input.input)
+
+			assert.Equal(t, test.Expected.gotcontextContext, gotcontextContext)
+		})
+	}
+}`,
+		},
 	}
 
 	for _, test := range tests {

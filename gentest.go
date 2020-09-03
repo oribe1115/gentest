@@ -199,6 +199,8 @@ func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, int) {
 				name = "ch"
 			case *types.Named:
 				name = strings.ReplaceAll(vType.String(), ".", "")
+			case *types.Struct:
+				name = strings.ReplaceAll(vType.String(), ".", "")
 			default:
 				name = typeString
 			}
