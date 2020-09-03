@@ -19,3 +19,7 @@ func pointerList(input []*string) []*string {
 func function(input func(i int) string) func(i int) string {
 	return input
 }
+
+func chanel(input chan int) chan int {
+	return input
+}

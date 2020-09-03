@@ -262,6 +262,31 @@ func TestFunction(t *testing.T) {
 	}
 }`,
 		},
+		{
+			Label:       "chanel func",
+			TestPackage: "b",
+			Offset:      372,
+			Expected: `
+func TestChanel(t *testing.T) {
+	type input struct {
+		input chan int
+	}
+	type expected struct {
+		gotch chan int
+	}
+	tests := []struct {
+		Label    string
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Label, func(t *testing.T) {
+			gotch := chanel(test.Input.input)
+
+			assert.Equal(t, test.Expected.gotch, gotch)
+		})
+	}
+}`,
+		},
 	}
 
 	for _, test := range tests {
