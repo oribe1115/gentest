@@ -376,6 +376,58 @@ func TestInterfaceFunc(t *testing.T) {
 	}
 }`,
 		},
+		{
+			Name:          "basic struct func",
+			TestPackage:   "c",
+			OffsetComment: "offset_basicStruct",
+			Expected: `
+func TestBasicStruct(t *testing.T) {
+	type input struct {
+		input struct{ name string }
+	}
+	type expected struct {
+		gotst struct{ name string }
+	}
+	tests := []struct {
+		Name     string
+		Input    input
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			gotst := basicStruct(test.Input.input)
+
+			assert.Equal(t, test.Expected.gotst, gotst)
+		})
+	}
+}`,
+		},
+		{
+			Name:          "basic interface func",
+			TestPackage:   "c",
+			OffsetComment: "offset_basicInterface",
+			Expected: `
+func TestBasicInterface(t *testing.T) {
+	type input struct {
+		input interface{ hoge() }
+	}
+	type expected struct {
+		gotin interface{ hoge() }
+	}
+	tests := []struct {
+		Name     string
+		Input    input
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			gotin := basicInterface(test.Input.input)
+
+			assert.Equal(t, test.Expected.gotin, gotin)
+		})
+	}
+}`,
+		},
 	}
 
 	for _, test := range tests {

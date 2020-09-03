@@ -14,3 +14,13 @@ func structFunc(input context.Context) context.Context {
 func interfaceFunc(input http.Handler) http.Handler {
 	return input
 }
+
+// offset_basicStruct
+func basicStruct(input struct{ name string }) struct{ name string } {
+	return input
+}
+
+// offset_basicInterface
+func basicInterface(input interface{ hoge() }) interface{ hoge() } {
+	return input
+}

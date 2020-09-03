@@ -215,6 +215,10 @@ func typeToVarNames(t types.Type) (typeString string, varName string) {
 		varName = "fn"
 	case *types.Chan:
 		varName = "ch"
+	case *types.Struct:
+		varName = "st"
+	case *types.Interface:
+		varName = "in"
 	case *types.Named:
 		if t.Obj().Pkg() != nil {
 			typeString = t.Obj().Pkg().Name() + "."
