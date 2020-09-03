@@ -295,8 +295,8 @@ func genExpectedStruct(bf *baseFuncData) string {
 
 func genTestCasesDef(bf *baseFuncData) string {
 	elements := make([]string, 0)
-	label := "Label string"
-	elements = append(elements, label)
+	name := "Name string"
+	elements = append(elements, name)
 
 	if len(bf.Params) != 0 {
 		input := "Input input"
@@ -309,8 +309,8 @@ func genTestCasesDef(bf *baseFuncData) string {
 	}
 
 	if bf.ResultErrorCount != 0 {
-		isErr := "IsError bool"
-		elements = append(elements, isErr)
+		want := "wantError bool"
+		elements = append(elements, want)
 	}
 
 	return "tests := []struct{" + strings.Join(elements, "\n") + "}{}"
@@ -322,13 +322,15 @@ func genAsserts(be *baseFuncData) string {
 	for _, v := range be.Results {
 		if v.IsError {
 			checkErr := fmt.Sprintf(`
-			if test.Expected.IsError {
+			if test.wantError {
 				assert.Error(t, %s)
-				return
+				if test.Expected.%s != nil {
+					assert.EqualError(t, %s, test.Expected.%s.String())
+				}
 			} else {
 				assert.NoError(t, %s)
 			}
-			`, v.Name, v.Name)
+			`, v.Name, v.Name, v.Name, v.Name, v.Name)
 			checkErrs = append(checkErrs, checkErr)
 		} else {
 			eq := fmt.Sprintf("assert.Equal(t, test.Expected.%s, %s)", v.Name, v.Name)
@@ -346,7 +348,7 @@ func {{.TestFuncName}}(t *testing.T){
 	{{.ExpectedStruct}}
 	{{.TestCasesDef}}
 	for _, test := range tests {
-		t.Run(test.Label, func(t *testing.T) {
+		t.Run(test.Name, func(t *testing.T) {
 			{{.ExecBaseFunc}}
 			{{.Asserts}}
 		})

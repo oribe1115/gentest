@@ -14,21 +14,21 @@ func TestAnalyzer(t *testing.T) {
 	testdata := analysistest.TestData()
 
 	tests := []struct {
-		Label       string
+		Name        string
 		TestPackage string
 		Offset      int
 		Expected    string
 	}{
 		{
-			Label:       "simple func",
+			Name:        "simple func",
 			TestPackage: "a",
 			Offset:      16,
 			Expected: `
 func TestF(t *testing.T) {
 
-	tests := []struct{ Label string }{}
+	tests := []struct{ Name string }{}
 	for _, test := range tests {
-		t.Run(test.Label, func(t *testing.T) {
+		t.Run(test.Name, func(t *testing.T) {
 			f()
 
 		})
@@ -36,7 +36,7 @@ func TestF(t *testing.T) {
 }`,
 		},
 		{
-			Label:       "simple int func",
+			Name:        "simple int func",
 			TestPackage: "a",
 			Offset:      39,
 			Expected: `
@@ -46,11 +46,11 @@ func TestReturnInt(t *testing.T) {
 		gotint int
 	}
 	tests := []struct {
-		Label    string
+		Name     string
 		Expected expected
 	}{}
 	for _, test := range tests {
-		t.Run(test.Label, func(t *testing.T) {
+		t.Run(test.Name, func(t *testing.T) {
 			gotint := returnInt()
 
 			assert.Equal(t, test.Expected.gotint, gotint)
@@ -59,7 +59,7 @@ func TestReturnInt(t *testing.T) {
 }`,
 		},
 		{
-			Label:       "multi int func",
+			Name:        "multi int func",
 			TestPackage: "a",
 			Offset:      72,
 			Expected: `
@@ -70,11 +70,11 @@ func TestReturnInts(t *testing.T) {
 		gotint2 int
 	}
 	tests := []struct {
-		Label    string
+		Name     string
 		Expected expected
 	}{}
 	for _, test := range tests {
-		t.Run(test.Label, func(t *testing.T) {
+		t.Run(test.Name, func(t *testing.T) {
 			gotint, gotint2 := returnInts()
 
 			assert.Equal(t, test.Expected.gotint, gotint)
@@ -84,7 +84,7 @@ func TestReturnInts(t *testing.T) {
 }`,
 		},
 		{
-			Label:       "int and error func",
+			Name:        "int and error func",
 			TestPackage: "a",
 			Offset:      123,
 			Expected: `
@@ -95,17 +95,19 @@ func TestReturnIntError(t *testing.T) {
 		goterror error
 	}
 	tests := []struct {
-		Label    string
-		Expected expected
-		IsError  bool
+		Name      string
+		Expected  expected
+		wantError bool
 	}{}
 	for _, test := range tests {
-		t.Run(test.Label, func(t *testing.T) {
+		t.Run(test.Name, func(t *testing.T) {
 			gotint, goterror := returnIntError()
 
-			if test.Expected.IsError {
+			if test.wantError {
 				assert.Error(t, goterror)
-				return
+				if test.Expected.goterror != nil {
+					assert.EqualError(t, goterror, test.Expected.goterror.String())
+				}
 			} else {
 				assert.NoError(t, goterror)
 			}
@@ -116,7 +118,7 @@ func TestReturnIntError(t *testing.T) {
 }`,
 		},
 		{
-			Label:       "input ints",
+			Name:        "input ints",
 			TestPackage: "a",
 			Offset:      172,
 			Expected: `
@@ -127,11 +129,11 @@ func TestInputInts(t *testing.T) {
 	}
 
 	tests := []struct {
-		Label string
+		Name  string
 		Input input
 	}{}
 	for _, test := range tests {
-		t.Run(test.Label, func(t *testing.T) {
+		t.Run(test.Name, func(t *testing.T) {
 			inputInts(test.Input.a, test.Input.b)
 
 		})
@@ -139,7 +141,7 @@ func TestInputInts(t *testing.T) {
 }`,
 		},
 		{
-			Label:       "intlist func",
+			Name:        "intlist func",
 			TestPackage: "b",
 			Offset:      17,
 			Expected: `
@@ -151,12 +153,12 @@ func TestIntList(t *testing.T) {
 		gotintList []int
 	}
 	tests := []struct {
-		Label    string
+		Name     string
 		Input    input
 		Expected expected
 	}{}
 	for _, test := range tests {
-		t.Run(test.Label, func(t *testing.T) {
+		t.Run(test.Name, func(t *testing.T) {
 			gotintList := intList(test.Input.list)
 
 			assert.Equal(t, test.Expected.gotintList, gotintList)
@@ -165,7 +167,7 @@ func TestIntList(t *testing.T) {
 }`,
 		},
 		{
-			Label:       "map func",
+			Name:        "map func",
 			TestPackage: "b",
 			Offset:      68,
 			Expected: `
@@ -178,12 +180,12 @@ func TestMapFunc(t *testing.T) {
 		gotmp2 map[string]error
 	}
 	tests := []struct {
-		Label    string
+		Name     string
 		Input    input
 		Expected expected
 	}{}
 	for _, test := range tests {
-		t.Run(test.Label, func(t *testing.T) {
+		t.Run(test.Name, func(t *testing.T) {
 			gotmp, gotmp2 := mapFunc(test.Input.input)
 
 			assert.Equal(t, test.Expected.gotmp, gotmp)
@@ -193,7 +195,7 @@ func TestMapFunc(t *testing.T) {
 }`,
 		},
 		{
-			Label:       "pointer func",
+			Name:        "pointer func",
 			TestPackage: "b",
 			Offset:      176,
 			Expected: `
@@ -205,12 +207,12 @@ func TestPointer(t *testing.T) {
 		gotpstring *string
 	}
 	tests := []struct {
-		Label    string
+		Name     string
 		Input    input
 		Expected expected
 	}{}
 	for _, test := range tests {
-		t.Run(test.Label, func(t *testing.T) {
+		t.Run(test.Name, func(t *testing.T) {
 			gotpstring := pointer(test.Input.input)
 
 			assert.Equal(t, test.Expected.gotpstring, gotpstring)
@@ -219,7 +221,7 @@ func TestPointer(t *testing.T) {
 }`,
 		},
 		{
-			Label:       "pointer func",
+			Name:        "pointer func",
 			TestPackage: "b",
 			Offset:      236,
 			Expected: `
@@ -231,12 +233,12 @@ func TestPointerList(t *testing.T) {
 		gotlist []*string
 	}
 	tests := []struct {
-		Label    string
+		Name     string
 		Input    input
 		Expected expected
 	}{}
 	for _, test := range tests {
-		t.Run(test.Label, func(t *testing.T) {
+		t.Run(test.Name, func(t *testing.T) {
 			gotlist := pointerList(test.Input.input)
 
 			assert.Equal(t, test.Expected.gotlist, gotlist)
@@ -245,7 +247,7 @@ func TestPointerList(t *testing.T) {
 }`,
 		},
 		{
-			Label:       "function func",
+			Name:        "function func",
 			TestPackage: "b",
 			Offset:      296,
 			Expected: `
@@ -257,12 +259,12 @@ func TestFunction(t *testing.T) {
 		gotfn func(i int) string
 	}
 	tests := []struct {
-		Label    string
+		Name     string
 		Input    input
 		Expected expected
 	}{}
 	for _, test := range tests {
-		t.Run(test.Label, func(t *testing.T) {
+		t.Run(test.Name, func(t *testing.T) {
 			gotfn := function(test.Input.input)
 
 			assert.Equal(t, test.Expected.gotfn, gotfn)
@@ -271,7 +273,7 @@ func TestFunction(t *testing.T) {
 }`,
 		},
 		{
-			Label:       "chanel func",
+			Name:        "chanel func",
 			TestPackage: "b",
 			Offset:      372,
 			Expected: `
@@ -283,12 +285,12 @@ func TestChanel(t *testing.T) {
 		gotch chan int
 	}
 	tests := []struct {
-		Label    string
+		Name     string
 		Input    input
 		Expected expected
 	}{}
 	for _, test := range tests {
-		t.Run(test.Label, func(t *testing.T) {
+		t.Run(test.Name, func(t *testing.T) {
 			gotch := chanel(test.Input.input)
 
 			assert.Equal(t, test.Expected.gotch, gotch)
@@ -297,7 +299,7 @@ func TestChanel(t *testing.T) {
 }`,
 		},
 		{
-			Label:       "mystruct func",
+			Name:        "mystruct func",
 			TestPackage: "b",
 			Offset:      459,
 			Expected: `
@@ -309,12 +311,12 @@ func TestMyStructFunc(t *testing.T) {
 		gotmyStruct b.myStruct
 	}
 	tests := []struct {
-		Label    string
+		Name     string
 		Input    input
 		Expected expected
 	}{}
 	for _, test := range tests {
-		t.Run(test.Label, func(t *testing.T) {
+		t.Run(test.Name, func(t *testing.T) {
 			gotmyStruct := myStructFunc(test.Input.ms)
 
 			assert.Equal(t, test.Expected.gotmyStruct, gotmyStruct)
@@ -323,7 +325,7 @@ func TestMyStructFunc(t *testing.T) {
 }`,
 		},
 		{
-			Label:       "struct func",
+			Name:        "struct func",
 			TestPackage: "c",
 			Offset:      57,
 			Expected: `
@@ -335,12 +337,12 @@ func TestStructFunc(t *testing.T) {
 		gotcontext context.Context
 	}
 	tests := []struct {
-		Label    string
+		Name     string
 		Input    input
 		Expected expected
 	}{}
 	for _, test := range tests {
-		t.Run(test.Label, func(t *testing.T) {
+		t.Run(test.Name, func(t *testing.T) {
 			gotcontext := structFunc(test.Input.input)
 
 			assert.Equal(t, test.Expected.gotcontext, gotcontext)
@@ -349,7 +351,7 @@ func TestStructFunc(t *testing.T) {
 }`,
 		},
 		{
-			Label:       "interface func",
+			Name:        "interface func",
 			TestPackage: "c",
 			Offset:      129,
 			Expected: `
@@ -361,12 +363,12 @@ func TestInterfaceFunc(t *testing.T) {
 		gothandler http.Handler
 	}
 	tests := []struct {
-		Label    string
+		Name     string
 		Input    input
 		Expected expected
 	}{}
 	for _, test := range tests {
-		t.Run(test.Label, func(t *testing.T) {
+		t.Run(test.Name, func(t *testing.T) {
 			gothandler := interfaceFunc(test.Input.input)
 
 			assert.Equal(t, test.Expected.gothandler, gothandler)
@@ -377,7 +379,7 @@ func TestInterfaceFunc(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Run(test.Label, func(t *testing.T) {
+		t.Run(test.Name, func(t *testing.T) {
 			buffer := &bytes.Buffer{}
 			gentest.SetWriter(buffer)
 			gentest.SetOffset(test.Offset)
