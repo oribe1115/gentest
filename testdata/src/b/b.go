@@ -23,3 +23,9 @@ func function(input func(i int) string) func(i int) string {
 func chanel(input chan int) chan int {
 	return input
 }
+
+type myStruct struct{}
+
+func myStructFunc(ms myStruct) myStruct {
+	return ms
+}
