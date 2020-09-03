@@ -212,17 +212,16 @@ func genExpectedStruct(bf *baseFuncData) string {
 }
 
 func genTestCasesDef(bf *baseFuncData) string {
-	result := "tests := []struct{"
+	elements := make([]string, 0)
+	label := "Label string"
+	elements = append(elements, label)
 
-	var expected string
 	if len(bf.Results) != 0 {
-		expected = "Expected expected"
+		expected := "Expected expected"
+		elements = append(elements, expected)
 	}
 
-	result += strings.Join([]string{expected}, ",")
-
-	result += "}{}"
-	return result
+	return "tests := []struct{" + strings.Join(elements, "\n") + "}{}"
 }
 func genAssertEqual(be *baseFuncData) string {
 	assrts := make([]string, 0)
@@ -240,7 +239,7 @@ func {{.TestFuncName}}(t *testing.T){
 	{{.ExpectedStruct}}
 	{{.TestCasesDef}}
 	for _, test := range tests {
-		t.Run("LABEL", func(t *testing.T) {
+		t.Run(test.Label, func(t *testing.T) {
 			{{.ExecBaseFunc}}
 			{{.AssertEqual}}
 		})

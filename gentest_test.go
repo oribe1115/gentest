@@ -26,9 +26,9 @@ func TestAnalyzer(t *testing.T) {
 			Expected: `
 func TestF(t *testing.T) {
 
-	tests := []struct{}{}
+	tests := []struct{ Label string }{}
 	for _, test := range tests {
-		t.Run("LABEL", func(t *testing.T) {
+		t.Run(test.Label, func(t *testing.T) {
 			f()
 
 		})
@@ -44,9 +44,12 @@ func TestReturnInt(t *testing.T) {
 	type expected struct {
 		gotint int
 	}
-	tests := []struct{ Expected expected }{}
+	tests := []struct {
+		Label    string
+		Expected expected
+	}{}
 	for _, test := range tests {
-		t.Run("LABEL", func(t *testing.T) {
+		t.Run(test.Label, func(t *testing.T) {
 			gotint := returnInt()
 			assert.Equal(t, test.Expected.gotint, gotint)
 		})
@@ -63,9 +66,12 @@ func TestReturnInts(t *testing.T) {
 		gotint  int
 		gotint2 int
 	}
-	tests := []struct{ Expected expected }{}
+	tests := []struct {
+		Label    string
+		Expected expected
+	}{}
 	for _, test := range tests {
-		t.Run("LABEL", func(t *testing.T) {
+		t.Run(test.Label, func(t *testing.T) {
 			gotint, gotint2 := returnInts()
 			assert.Equal(t, test.Expected.gotint, gotint)
 			assert.Equal(t, test.Expected.gotint2, gotint2)
