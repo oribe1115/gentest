@@ -19,8 +19,7 @@ import (
 const doc = "gentest is ..."
 
 var writer io.Writer
-var fileName string // -file flag
-var offset int      // -offset flag
+var offset int // -offset flag
 
 // Analyzer is ...
 var Analyzer = &analysis.Analyzer{

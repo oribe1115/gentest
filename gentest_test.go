@@ -14,15 +14,15 @@ func TestAnalyzer(t *testing.T) {
 	testdata := analysistest.TestData()
 
 	tests := []struct {
-		Label    string
-		TestDir  string
-		Offset   int
-		Expected string
+		Label       string
+		TestPackage string
+		Offset      int
+		Expected    string
 	}{
 		{
-			Label:   "simple func",
-			TestDir: "a",
-			Offset:  17,
+			Label:       "simple func",
+			TestPackage: "a",
+			Offset:      17,
 			Expected: `
 func TestF(t *testing.T) {
 
@@ -36,9 +36,9 @@ func TestF(t *testing.T) {
 }`,
 		},
 		{
-			Label:   "simple int func",
-			TestDir: "a",
-			Offset:  117,
+			Label:       "simple int func",
+			TestPackage: "a",
+			Offset:      117,
 			Expected: `
 func TestReturnInt(t *testing.T) {
 
@@ -59,9 +59,9 @@ func TestReturnInt(t *testing.T) {
 }`,
 		},
 		{
-			Label:   "multi int func",
-			TestDir: "a",
-			Offset:  156,
+			Label:       "multi int func",
+			TestPackage: "a",
+			Offset:      156,
 			Expected: `
 func TestReturnInts(t *testing.T) {
 
@@ -84,9 +84,9 @@ func TestReturnInts(t *testing.T) {
 }`,
 		},
 		{
-			Label:   "int and error func",
-			TestDir: "a",
-			Offset:  198,
+			Label:       "int and error func",
+			TestPackage: "a",
+			Offset:      198,
 			Expected: `
 func TestReturnIntError(t *testing.T) {
 
@@ -116,9 +116,9 @@ func TestReturnIntError(t *testing.T) {
 }`,
 		},
 		{
-			Label:   "input ints",
-			TestDir: "a",
-			Offset:  257,
+			Label:       "input ints",
+			TestPackage: "a",
+			Offset:      257,
 			Expected: `
 func TestInputInts(t *testing.T) {
 	type input struct {
@@ -136,9 +136,9 @@ func TestInputInts(t *testing.T) {
 }`,
 		},
 		{
-			Label:   "intlist func",
-			TestDir: "a",
-			Offset:  290,
+			Label:       "intlist func",
+			TestPackage: "b",
+			Offset:      17,
 			Expected: `
 func TestIntList(t *testing.T) {
 	type input struct {
@@ -167,7 +167,7 @@ func TestIntList(t *testing.T) {
 			buffer := &bytes.Buffer{}
 			gentest.SetWriter(buffer)
 			gentest.SetOffset(test.Offset)
-			analysistest.Run(t, testdata, gentest.Analyzer, test.TestDir)
+			analysistest.Run(t, testdata, gentest.Analyzer, test.TestPackage)
 			assert.Equal(t, test.Expected, buffer.String())
 		})
 
