@@ -170,8 +170,24 @@ func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, int) {
 	for i := 0; i < tuple.Len(); i++ {
 		v := tuple.At(i)
 		name := v.Name()
-		if name == "" {
-			name = v.Type().String()
+
+		var typeString string
+		switch vType := v.Type().(type) {
+		case *types.Array:
+			typeString = "[]" + vType.Elem().String()
+			if name == "" {
+				name = vType.Elem().String() + "List"
+			}
+		case *types.Slice:
+			typeString = "[]" + vType.Elem().String()
+			if name == "" {
+				name = vType.Elem().String() + "List"
+			}
+		default:
+			typeString = vType.String()
+			if name == "" {
+				name = typeString
+			}
 		}
 
 		name = prefix + name
@@ -191,7 +207,7 @@ func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, int) {
 		value := &varField{
 			Name:     name,
 			Type:     v.Type(),
-			TypeName: v.Type().String(),
+			TypeName: typeString,
 			IsError:  isError,
 		}
 

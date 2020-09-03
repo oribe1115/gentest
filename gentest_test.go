@@ -135,6 +135,31 @@ func TestInputInts(t *testing.T) {
 	}
 }`,
 		},
+		{
+			Label:   "intlist func",
+			TestDir: "a",
+			Offset:  326,
+			Expected: `
+func TestIntList(t *testing.T) {
+	type input struct {
+		list []int
+	}
+	type expected struct {
+		gotintList []int
+	}
+	tests := []struct {
+		Label    string
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Label, func(t *testing.T) {
+			gotintList := intList(test.Input.list)
+
+			assert.Equal(t, test.Expected.gotintList, gotintList)
+		})
+	}
+}`,
+		},
 	}
 
 	for _, test := range tests {

@@ -20,3 +20,7 @@ func returnIntError() (int, error) {
 
 func inputInts(a int, b int) {
 }
+
+func intList(list []int) []int {
+	return list
+}
