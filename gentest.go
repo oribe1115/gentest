@@ -34,6 +34,7 @@ var Analyzer = &analysis.Analyzer{
 
 type outputField struct {
 	TestFuncName   string
+	InputStruct    string
 	ExpectedStruct string
 	TestCasesDef   string
 	ExecBaseFunc   string
@@ -43,6 +44,7 @@ type outputField struct {
 type baseFuncData struct {
 	FuncDecl         *ast.FuncDecl
 	Signature        *types.Signature
+	Params           []*varField
 	Results          []*varField
 	ResultErrorCount int
 }
@@ -77,10 +79,12 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		return nil, err
 	}
 
-	baseFunc.setReturns(pass)
+	baseFunc.setReturns()
+	baseFunc.setParams()
 
 	of := &outputField{}
 	of.TestFuncName = genTestFuncName(funcDecl.Name.String())
+	of.InputStruct = genInputStruct(baseFunc)
 	of.ExpectedStruct = genExpectedStruct(baseFunc)
 	of.TestCasesDef = genTestCasesDef(baseFunc)
 	of.ExecBaseFunc, err = genExecBaseCode(baseFunc)
@@ -131,7 +135,14 @@ func genExecBaseCode(bf *baseFuncData) (string, error) {
 	if len(resultNames) != 0 {
 		result += strings.Join(resultNames, ",") + ":="
 	}
-	result += fmt.Sprintf("%s()", funcName)
+
+	paramNames := make([]string, 0)
+	for _, param := range bf.Params {
+		input := fmt.Sprintf("test.Input.%s", param.Name)
+		paramNames = append(paramNames, input)
+	}
+
+	result += fmt.Sprintf("%s(%s)", funcName, strings.Join(paramNames, ","))
 	return result, nil
 }
 
@@ -190,8 +201,24 @@ func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, int) {
 	return varFields, errCount
 }
 
-func (bf *baseFuncData) setReturns(pass *analysis.Pass) {
+func (bf *baseFuncData) setReturns() {
 	bf.Results, bf.ResultErrorCount = tupleToVarFields(bf.Signature.Results(), "got")
+}
+
+func (bf *baseFuncData) setParams() {
+	bf.Params, _ = tupleToVarFields(bf.Signature.Params(), "")
+}
+
+func genInputStruct(bf *baseFuncData) string {
+	if len(bf.Params) == 0 {
+		return ""
+	}
+	result := "type input struct {\n"
+	for _, param := range bf.Params {
+		result += fmt.Sprintf("%s %s\n", param.Name, param.TypeName)
+	}
+	result += "}"
+	return result
 }
 
 func genExpectedStruct(bf *baseFuncData) string {
@@ -251,6 +278,7 @@ func genAsserts(be *baseFuncData) string {
 func outputTestCode(of *outputField) error {
 	testCodeTemplate := `
 func {{.TestFuncName}}(t *testing.T){
+	{{.InputStruct}}
 	{{.ExpectedStruct}}
 	{{.TestCasesDef}}
 	for _, test := range tests {
@@ -265,6 +293,7 @@ func {{.TestFuncName}}(t *testing.T){
 
 	field := map[string]string{
 		"TestFuncName":   of.TestFuncName,
+		"InputStruct":    of.InputStruct,
 		"ExpectedStruct": of.ExpectedStruct,
 		"TestCasesDef":   of.TestCasesDef,
 		"ExecBaseFunc":   of.ExecBaseFunc,

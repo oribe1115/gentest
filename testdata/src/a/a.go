@@ -17,3 +17,6 @@ func returnInts() (int, int) {
 func returnIntError() (int, error) {
 	return 0, nil
 }
+
+func inputInts(a int, b int) {
+}

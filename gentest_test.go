@@ -41,6 +41,7 @@ func TestF(t *testing.T) {
 			Offset:  142,
 			Expected: `
 func TestReturnInt(t *testing.T) {
+
 	type expected struct {
 		gotint int
 	}
@@ -63,6 +64,7 @@ func TestReturnInt(t *testing.T) {
 			Offset:  189,
 			Expected: `
 func TestReturnInts(t *testing.T) {
+
 	type expected struct {
 		gotint  int
 		gotint2 int
@@ -87,6 +89,7 @@ func TestReturnInts(t *testing.T) {
 			Offset:  244,
 			Expected: `
 func TestReturnIntError(t *testing.T) {
+
 	type expected struct {
 		gotint   int
 		goterror error
@@ -108,6 +111,26 @@ func TestReturnIntError(t *testing.T) {
 			}
 
 			assert.Equal(t, test.Expected.gotint, gotint)
+		})
+	}
+}`,
+		},
+		{
+			Label:   "input ints",
+			TestDir: "a",
+			Offset:  278,
+			Expected: `
+func TestInputInts(t *testing.T) {
+	type input struct {
+		a int
+		b int
+	}
+
+	tests := []struct{ Label string }{}
+	for _, test := range tests {
+		t.Run(test.Label, func(t *testing.T) {
+			inputInts(test.Input.a, test.Input.b)
+
 		})
 	}
 }`,
