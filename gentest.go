@@ -34,6 +34,7 @@ var Analyzer = &analysis.Analyzer{
 
 type outputField struct {
 	TestFuncName   string
+	UseDef         string
 	InputStruct    string
 	ExpectedStruct string
 	TestCasesDef   string
@@ -47,6 +48,7 @@ type baseFuncData struct {
 	Params           []*varField
 	Results          []*varField
 	ResultErrorCount int
+	Recv             *varField
 }
 
 type varField struct {
@@ -89,6 +91,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 
 	baseFunc.setReturns()
 	baseFunc.setParams()
+	baseFunc.setRecv()
 
 	of := &outputField{}
 	of.TestFuncName = genTestFuncName(funcDecl.Name.String())
@@ -154,6 +157,11 @@ func genExecBaseCode(bf *baseFuncData) (string, error) {
 	var result string
 	funcName := bf.FuncDecl.Name.String()
 
+	var use string
+	if bf.Recv != nil {
+		use = "test.Use."
+	}
+
 	resultNames := make([]string, 0)
 	for _, re := range bf.Results {
 		resultNames = append(resultNames, re.Name)
@@ -168,7 +176,7 @@ func genExecBaseCode(bf *baseFuncData) (string, error) {
 		paramNames = append(paramNames, input)
 	}
 
-	result += fmt.Sprintf("%s(%s)", funcName, strings.Join(paramNames, ","))
+	result += fmt.Sprintf("%s%s(%s)", use, funcName, strings.Join(paramNames, ","))
 	return result, nil
 }
 
@@ -289,6 +297,23 @@ func (bf *baseFuncData) setParams() {
 	bf.Params, _ = tupleToVarFields(bf.Signature.Params(), "")
 }
 
+func (bf *baseFuncData) setRecv() {
+	recv := bf.Signature.Recv()
+	if recv == nil {
+		bf.Recv = nil
+		return
+	}
+
+	typeName, varName := typeToVarNames(recv.Type())
+
+	bf.Recv = &varField{
+		Name:     varName,
+		Type:     recv.Type(),
+		TypeName: typeName,
+		IsError:  false,
+	}
+}
+
 func genInputStruct(bf *baseFuncData) string {
 	if len(bf.Params) == 0 {
 		return ""
@@ -318,6 +343,11 @@ func genTestCasesDef(bf *baseFuncData) string {
 	elements := make([]string, 0)
 	name := "Name string"
 	elements = append(elements, name)
+
+	if bf.Recv != nil {
+		use := fmt.Sprintf("Use %s", bf.Recv.TypeName)
+		elements = append(elements, use)
+	}
 
 	if len(bf.Params) != 0 {
 		input := "Input input"

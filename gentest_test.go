@@ -428,6 +428,44 @@ func TestNamedInterface(t *testing.T) {
 	}
 }`,
 		},
+		{
+			Name:          "basic reciever func",
+			TestPackage:   "d",
+			OffsetComment: "offset_basicRecv",
+			Expected: `
+func TestBasicRecv(t *testing.T) {
+
+	tests := []struct {
+		Name string
+		Use  d.T
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			test.Use.basicRecv()
+
+		})
+	}
+}`,
+		},
+		{
+			Name:          "pointer reciever func",
+			TestPackage:   "d",
+			OffsetComment: "offset_pointerRecv",
+			Expected: `
+func TestPointerRecv(t *testing.T) {
+
+	tests := []struct {
+		Name string
+		Use  *d.T
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			test.Use.pointerRecv()
+
+		})
+	}
+}`,
+		},
 	}
 
 	for _, test := range tests {
