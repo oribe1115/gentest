@@ -42,7 +42,7 @@ type outputField struct {
 type baseFuncData struct {
 	FuncDecl  *ast.FuncDecl
 	Signature *types.Signature
-	Returns   []*varField
+	Results   []*varField
 }
 
 type varField struct {
@@ -123,12 +123,12 @@ func genExecBaseCode(bf *baseFuncData) (string, error) {
 	var result string
 	funcName := bf.FuncDecl.Name.String()
 
-	retrunNames := make([]string, 0)
-	for _, re := range bf.Returns {
-		retrunNames = append(retrunNames, re.Name)
+	resultNames := make([]string, 0)
+	for _, re := range bf.Results {
+		resultNames = append(resultNames, re.Name)
 	}
-	if len(retrunNames) != 0 {
-		result += strings.Join(retrunNames, ",") + ":="
+	if len(resultNames) != 0 {
+		result += strings.Join(resultNames, ",") + ":="
 	}
 	result += fmt.Sprintf("%s()", funcName)
 	return result, nil
@@ -186,22 +186,22 @@ func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, error) {
 }
 
 func (bf *baseFuncData) setReturns(pass *analysis.Pass) error {
-	returns, err := tupleToVarFields(bf.Signature.Results(), "got")
+	results, err := tupleToVarFields(bf.Signature.Results(), "got")
 	if err != nil {
 		return err
 	}
 
-	bf.Returns = returns
+	bf.Results = results
 
 	return nil
 }
 
 func genExpectedStruct(bf *baseFuncData) string {
-	if len(bf.Returns) == 0 {
+	if len(bf.Results) == 0 {
 		return ""
 	}
 	result := "type expected struct {\n"
-	for _, re := range bf.Returns {
+	for _, re := range bf.Results {
 		result += fmt.Sprintf("%s %s\n", re.Name, re.TypeName)
 	}
 	result += "}"
@@ -213,7 +213,7 @@ func genTestCasesDef(bf *baseFuncData) string {
 	result := "tests := []struct{"
 
 	var expected string
-	if len(bf.Returns) != 0 {
+	if len(bf.Results) != 0 {
 		expected = "Expected expected"
 	}
 
