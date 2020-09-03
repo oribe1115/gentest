@@ -185,6 +185,8 @@ func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, int) {
 				} else {
 					name = "list"
 				}
+			case *types.Map:
+				name = "mp"
 			default:
 				name = typeString
 			}

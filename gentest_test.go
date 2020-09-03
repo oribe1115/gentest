@@ -160,6 +160,33 @@ func TestIntList(t *testing.T) {
 	}
 }`,
 		},
+		{
+			Label:       "map func",
+			TestPackage: "b",
+			Offset:      68,
+			Expected: `
+func TestMapFunc(t *testing.T) {
+	type input struct {
+		input map[int]string
+	}
+	type expected struct {
+		gotmp  map[int]string
+		gotmp2 map[string]error
+	}
+	tests := []struct {
+		Label    string
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Label, func(t *testing.T) {
+			gotmp, gotmp2 := mapFunc(test.Input.input)
+
+			assert.Equal(t, test.Expected.gotmp, gotmp)
+			assert.Equal(t, test.Expected.gotmp2, gotmp2)
+		})
+	}
+}`,
+		},
 	}
 
 	for _, test := range tests {
