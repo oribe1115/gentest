@@ -22,7 +22,7 @@ func TestAnalyzer(t *testing.T) {
 		{
 			Label:   "simple func",
 			TestDir: "a",
-			Offset:  30,
+			Offset:  17,
 			Expected: `
 func TestF(t *testing.T) {
 
@@ -38,7 +38,7 @@ func TestF(t *testing.T) {
 		{
 			Label:   "simple int func",
 			TestDir: "a",
-			Offset:  142,
+			Offset:  117,
 			Expected: `
 func TestReturnInt(t *testing.T) {
 
@@ -61,7 +61,7 @@ func TestReturnInt(t *testing.T) {
 		{
 			Label:   "multi int func",
 			TestDir: "a",
-			Offset:  189,
+			Offset:  156,
 			Expected: `
 func TestReturnInts(t *testing.T) {
 
@@ -86,7 +86,7 @@ func TestReturnInts(t *testing.T) {
 		{
 			Label:   "int and error func",
 			TestDir: "a",
-			Offset:  244,
+			Offset:  198,
 			Expected: `
 func TestReturnIntError(t *testing.T) {
 
@@ -118,7 +118,7 @@ func TestReturnIntError(t *testing.T) {
 		{
 			Label:   "input ints",
 			TestDir: "a",
-			Offset:  278,
+			Offset:  257,
 			Expected: `
 func TestInputInts(t *testing.T) {
 	type input struct {
@@ -138,7 +138,7 @@ func TestInputInts(t *testing.T) {
 		{
 			Label:   "intlist func",
 			TestDir: "a",
-			Offset:  326,
+			Offset:  290,
 			Expected: `
 func TestIntList(t *testing.T) {
 	type input struct {

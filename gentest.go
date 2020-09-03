@@ -105,10 +105,10 @@ func findTargetFunc(pass *analysis.Pass) (*ast.FuncDecl, error) {
 				continue
 			}
 
-			blockStmt := funcDecl.Body
-			lbrecePosition := pass.Fset.Position(blockStmt.Lbrace)
-			rbrecePosition := pass.Fset.Position(blockStmt.Rbrace)
-			if lbrecePosition.Offset <= offset && offset <= rbrecePosition.Offset {
+			startOffset := pass.Fset.Position(funcDecl.Name.Pos()).Offset
+			endOffset := pass.Fset.Position(funcDecl.Name.End()).Offset
+
+			if startOffset <= offset && offset <= endOffset {
 				return funcDecl, nil
 			}
 		}
