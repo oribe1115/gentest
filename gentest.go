@@ -160,62 +160,52 @@ func (bf *baseFuncData) setSignature(pass *analysis.Pass) error {
 	return nil
 }
 
-func trimedSlushTypeString(t types.Type) string {
-	slush := strings.Split(t.String(), "/")
-	slushLast := slush[len(slush)-1]
-	return slushLast
-}
-
-func trimedAllTypeString(t types.Type) string {
-	slushLast := trimedSlushTypeString(t)
-	period := strings.Split(slushLast, ".")
-	periodLast := period[len(period)-1]
-
-	result := strings.ToLower(string(periodLast[0]))
-	if len(periodLast) > 1 {
-		result += periodLast[1:]
-	}
-	return result
-}
-
-func typeToVarName(t types.Type) string {
-	var name string
+func typeToVarNames(t types.Type) (typeString string, varName string) {
 	switch t := t.(type) {
+	case *types.Basic:
+		varName = t.Name()
 	case *types.Array:
 		if elem, _ := t.Elem().(*types.Basic); elem != nil {
-			name = elem.Name() + "List"
+			varName = elem.Name() + "List"
 		} else {
-			name = "list"
+			varName = "list"
 		}
 	case *types.Slice:
 		if elem, _ := t.Elem().(*types.Basic); elem != nil {
-			name = elem.Name() + "List"
+			varName = elem.Name() + "List"
 		} else {
-			name = "list"
+			varName = "list"
 		}
 	case *types.Map:
-		name = "mp"
+		varName = "mp"
 	case *types.Pointer:
 		if elem, _ := t.Elem().(*types.Basic); elem != nil {
-			name = "p" + elem.Name()
+			varName = "p" + elem.Name()
 		} else {
-			name = "p"
+			varName = "p"
 		}
 	case *types.Signature:
-		name = "fn"
+		varName = "fn"
 	case *types.Chan:
-		name = "ch"
+		varName = "ch"
 	case *types.Named:
-		name = strings.ReplaceAll(trimedAllTypeString(t), ".", "")
-	case *types.Struct:
-		name = strings.ReplaceAll(trimedAllTypeString(t), ".", "")
-	case *types.Interface:
-		name = trimedAllTypeString(t)
-	default:
-		name = trimedAllTypeString(t)
+		if t.Obj().Pkg() != nil {
+			typeString = t.Obj().Pkg().Name() + "."
+		}
+		typeString += t.Obj().Name()
+
+		objName := t.Obj().Name()
+		varName = strings.ToLower(string(objName[0]))
+		if len(objName) > 1 {
+			varName += objName[1:]
+		}
 	}
 
-	return name
+	if typeString == "" {
+		typeString = t.String()
+	}
+
+	return typeString, varName
 }
 
 func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, int) {
@@ -226,11 +216,11 @@ func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, int) {
 
 	for i := 0; i < tuple.Len(); i++ {
 		v := tuple.At(i)
-		typeString := trimedSlushTypeString(v.Type())
 		name := v.Name()
 
+		typeString, varName := typeToVarNames(v.Type())
 		if name == "" {
-			name = typeToVarName(v.Type())
+			name = varName
 		}
 
 		name = prefix + name
