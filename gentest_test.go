@@ -126,7 +126,10 @@ func TestInputInts(t *testing.T) {
 		b int
 	}
 
-	tests := []struct{ Label string }{}
+	tests := []struct {
+		Label string
+		Input input
+	}{}
 	for _, test := range tests {
 		t.Run(test.Label, func(t *testing.T) {
 			inputInts(test.Input.a, test.Input.b)
@@ -149,6 +152,7 @@ func TestIntList(t *testing.T) {
 	}
 	tests := []struct {
 		Label    string
+		Input    input
 		Expected expected
 	}{}
 	for _, test := range tests {
@@ -175,6 +179,7 @@ func TestMapFunc(t *testing.T) {
 	}
 	tests := []struct {
 		Label    string
+		Input    input
 		Expected expected
 	}{}
 	for _, test := range tests {
@@ -201,6 +206,7 @@ func TestPointer(t *testing.T) {
 	}
 	tests := []struct {
 		Label    string
+		Input    input
 		Expected expected
 	}{}
 	for _, test := range tests {
@@ -226,6 +232,7 @@ func TestPointerList(t *testing.T) {
 	}
 	tests := []struct {
 		Label    string
+		Input    input
 		Expected expected
 	}{}
 	for _, test := range tests {
@@ -251,6 +258,7 @@ func TestFunction(t *testing.T) {
 	}
 	tests := []struct {
 		Label    string
+		Input    input
 		Expected expected
 	}{}
 	for _, test := range tests {
@@ -276,6 +284,7 @@ func TestChanel(t *testing.T) {
 	}
 	tests := []struct {
 		Label    string
+		Input    input
 		Expected expected
 	}{}
 	for _, test := range tests {
@@ -301,6 +310,7 @@ func TestMyStructFunc(t *testing.T) {
 	}
 	tests := []struct {
 		Label    string
+		Input    input
 		Expected expected
 	}{}
 	for _, test := range tests {

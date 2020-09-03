@@ -269,6 +269,11 @@ func genTestCasesDef(bf *baseFuncData) string {
 	label := "Label string"
 	elements = append(elements, label)
 
+	if len(bf.Params) != 0 {
+		input := "Input input"
+		elements = append(elements, input)
+	}
+
 	if len(bf.Results) != 0 {
 		expected := "Expected expected"
 		elements = append(elements, expected)
