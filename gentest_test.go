@@ -325,58 +325,6 @@ func TestMyStructFunc(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "struct func",
-			TestPackage:   "c",
-			OffsetComment: "offset_structFunc",
-			Expected: `
-func TestStructFunc(t *testing.T) {
-	type input struct {
-		input context.Context
-	}
-	type expected struct {
-		gotcontext context.Context
-	}
-	tests := []struct {
-		Name     string
-		Input    input
-		Expected expected
-	}{}
-	for _, test := range tests {
-		t.Run(test.Name, func(t *testing.T) {
-			gotcontext := structFunc(test.Input.input)
-
-			assert.Equal(t, test.Expected.gotcontext, gotcontext)
-		})
-	}
-}`,
-		},
-		{
-			Name:          "interface func",
-			TestPackage:   "c",
-			OffsetComment: "offset_interfaceFunc",
-			Expected: `
-func TestInterfaceFunc(t *testing.T) {
-	type input struct {
-		input http.Handler
-	}
-	type expected struct {
-		gothandler http.Handler
-	}
-	tests := []struct {
-		Name     string
-		Input    input
-		Expected expected
-	}{}
-	for _, test := range tests {
-		t.Run(test.Name, func(t *testing.T) {
-			gothandler := interfaceFunc(test.Input.input)
-
-			assert.Equal(t, test.Expected.gothandler, gothandler)
-		})
-	}
-}`,
-		},
-		{
 			Name:          "basic struct func",
 			TestPackage:   "c",
 			OffsetComment: "offset_basicStruct",
@@ -424,6 +372,58 @@ func TestBasicInterface(t *testing.T) {
 			gotin := basicInterface(test.Input.input)
 
 			assert.Equal(t, test.Expected.gotin, gotin)
+		})
+	}
+}`,
+		},
+		{
+			Name:          "named struct func",
+			TestPackage:   "c",
+			OffsetComment: "offset_namedStruct",
+			Expected: `
+func TestNamedStruct(t *testing.T) {
+	type input struct {
+		input context.Context
+	}
+	type expected struct {
+		gotcontext context.Context
+	}
+	tests := []struct {
+		Name     string
+		Input    input
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			gotcontext := namedStruct(test.Input.input)
+
+			assert.Equal(t, test.Expected.gotcontext, gotcontext)
+		})
+	}
+}`,
+		},
+		{
+			Name:          "named interface func",
+			TestPackage:   "c",
+			OffsetComment: "offset_namedInterface",
+			Expected: `
+func TestNamedInterface(t *testing.T) {
+	type input struct {
+		input http.Handler
+	}
+	type expected struct {
+		gothandler http.Handler
+	}
+	tests := []struct {
+		Name     string
+		Input    input
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			gothandler := namedInterface(test.Input.input)
+
+			assert.Equal(t, test.Expected.gothandler, gothandler)
 		})
 	}
 }`,
