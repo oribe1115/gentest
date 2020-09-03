@@ -193,6 +193,10 @@ func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, int) {
 				} else {
 					name = "p"
 				}
+			case *types.Signature:
+				name = "fn"
+			case *types.Chan:
+				name = "ch"
 			default:
 				name = typeString
 			}

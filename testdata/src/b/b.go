@@ -15,3 +15,7 @@ func pointer(input *string) *string {
 func pointerList(input []*string) []*string {
 	return input
 }
+
+func function(input func(i int) string) func(i int) string {
+	return input
+}

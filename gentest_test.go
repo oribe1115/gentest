@@ -237,6 +237,31 @@ func TestPointerList(t *testing.T) {
 	}
 }`,
 		},
+		{
+			Label:       "function func",
+			TestPackage: "b",
+			Offset:      296,
+			Expected: `
+func TestFunction(t *testing.T) {
+	type input struct {
+		input func(i int) string
+	}
+	type expected struct {
+		gotfn func(i int) string
+	}
+	tests := []struct {
+		Label    string
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Label, func(t *testing.T) {
+			gotfn := function(test.Input.input)
+
+			assert.Equal(t, test.Expected.gotfn, gotfn)
+		})
+	}
+}`,
+		},
 	}
 
 	for _, test := range tests {
