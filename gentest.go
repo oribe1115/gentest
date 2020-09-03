@@ -187,6 +187,12 @@ func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, int) {
 				}
 			case *types.Map:
 				name = "mp"
+			case *types.Pointer:
+				if elem, _ := vType.Elem().(*types.Basic); elem != nil {
+					name = "p" + elem.Name()
+				} else {
+					name = "p"
+				}
 			default:
 				name = typeString
 			}

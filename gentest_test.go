@@ -187,6 +187,56 @@ func TestMapFunc(t *testing.T) {
 	}
 }`,
 		},
+		{
+			Label:       "pointer func",
+			TestPackage: "b",
+			Offset:      176,
+			Expected: `
+func TestPointer(t *testing.T) {
+	type input struct {
+		input *string
+	}
+	type expected struct {
+		gotpstring *string
+	}
+	tests := []struct {
+		Label    string
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Label, func(t *testing.T) {
+			gotpstring := pointer(test.Input.input)
+
+			assert.Equal(t, test.Expected.gotpstring, gotpstring)
+		})
+	}
+}`,
+		},
+		{
+			Label:       "pointer func",
+			TestPackage: "b",
+			Offset:      236,
+			Expected: `
+func TestPointerList(t *testing.T) {
+	type input struct {
+		input []*string
+	}
+	type expected struct {
+		gotlist []*string
+	}
+	tests := []struct {
+		Label    string
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Label, func(t *testing.T) {
+			gotlist := pointerList(test.Input.input)
+
+			assert.Equal(t, test.Expected.gotlist, gotlist)
+		})
+	}
+}`,
+		},
 	}
 
 	for _, test := range tests {

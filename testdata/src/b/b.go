@@ -7,3 +7,11 @@ func intList(list []int) []int {
 func mapFunc(input map[int]string) (map[int]string, map[string]error) {
 	return input, map[string]error{}
 }
+
+func pointer(input *string) *string {
+	return input
+}
+
+func pointerList(input []*string) []*string {
+	return input
+}
