@@ -8,6 +8,6 @@ func SetWriter(testWriter io.Writer) {
 	writer = testWriter
 }
 
-func SetOffset(o int) {
-	offset = o
+func SetOffsetComent(oc string) {
+	offsetComment = oc
 }

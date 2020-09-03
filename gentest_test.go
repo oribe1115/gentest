@@ -14,15 +14,15 @@ func TestAnalyzer(t *testing.T) {
 	testdata := analysistest.TestData()
 
 	tests := []struct {
-		Name        string
-		TestPackage string
-		Offset      int
-		Expected    string
+		Name          string
+		TestPackage   string
+		OffsetComment string
+		Expected      string
 	}{
 		{
-			Name:        "simple func",
-			TestPackage: "a",
-			Offset:      16,
+			Name:          "simple func",
+			TestPackage:   "a",
+			OffsetComment: "offset_f",
 			Expected: `
 func TestF(t *testing.T) {
 
@@ -36,9 +36,9 @@ func TestF(t *testing.T) {
 }`,
 		},
 		{
-			Name:        "simple int func",
-			TestPackage: "a",
-			Offset:      39,
+			Name:          "simple int func",
+			TestPackage:   "a",
+			OffsetComment: "offset_returnInt",
 			Expected: `
 func TestReturnInt(t *testing.T) {
 
@@ -59,9 +59,9 @@ func TestReturnInt(t *testing.T) {
 }`,
 		},
 		{
-			Name:        "multi int func",
-			TestPackage: "a",
-			Offset:      72,
+			Name:          "multi int func",
+			TestPackage:   "a",
+			OffsetComment: "offset_returnInts",
 			Expected: `
 func TestReturnInts(t *testing.T) {
 
@@ -84,9 +84,9 @@ func TestReturnInts(t *testing.T) {
 }`,
 		},
 		{
-			Name:        "int and error func",
-			TestPackage: "a",
-			Offset:      123,
+			Name:          "int and error func",
+			TestPackage:   "a",
+			OffsetComment: "offset_returnIntError",
 			Expected: `
 func TestReturnIntError(t *testing.T) {
 
@@ -118,9 +118,9 @@ func TestReturnIntError(t *testing.T) {
 }`,
 		},
 		{
-			Name:        "input ints",
-			TestPackage: "a",
-			Offset:      172,
+			Name:          "input ints",
+			TestPackage:   "a",
+			OffsetComment: "offset_inputInts",
 			Expected: `
 func TestInputInts(t *testing.T) {
 	type input struct {
@@ -141,9 +141,9 @@ func TestInputInts(t *testing.T) {
 }`,
 		},
 		{
-			Name:        "intlist func",
-			TestPackage: "b",
-			Offset:      17,
+			Name:          "intlist func",
+			TestPackage:   "b",
+			OffsetComment: "offset_intList",
 			Expected: `
 func TestIntList(t *testing.T) {
 	type input struct {
@@ -167,9 +167,9 @@ func TestIntList(t *testing.T) {
 }`,
 		},
 		{
-			Name:        "map func",
-			TestPackage: "b",
-			Offset:      68,
+			Name:          "map func",
+			TestPackage:   "b",
+			OffsetComment: "offset_mapFunc",
 			Expected: `
 func TestMapFunc(t *testing.T) {
 	type input struct {
@@ -195,9 +195,9 @@ func TestMapFunc(t *testing.T) {
 }`,
 		},
 		{
-			Name:        "pointer func",
-			TestPackage: "b",
-			Offset:      176,
+			Name:          "pointer func",
+			TestPackage:   "b",
+			OffsetComment: "offset_pointer",
 			Expected: `
 func TestPointer(t *testing.T) {
 	type input struct {
@@ -221,9 +221,9 @@ func TestPointer(t *testing.T) {
 }`,
 		},
 		{
-			Name:        "pointer func",
-			TestPackage: "b",
-			Offset:      236,
+			Name:          "pointer func",
+			TestPackage:   "b",
+			OffsetComment: "offset_pointerList",
 			Expected: `
 func TestPointerList(t *testing.T) {
 	type input struct {
@@ -247,9 +247,9 @@ func TestPointerList(t *testing.T) {
 }`,
 		},
 		{
-			Name:        "function func",
-			TestPackage: "b",
-			Offset:      296,
+			Name:          "function func",
+			TestPackage:   "b",
+			OffsetComment: "offset_function",
 			Expected: `
 func TestFunction(t *testing.T) {
 	type input struct {
@@ -273,9 +273,9 @@ func TestFunction(t *testing.T) {
 }`,
 		},
 		{
-			Name:        "chanel func",
-			TestPackage: "b",
-			Offset:      372,
+			Name:          "chanel func",
+			TestPackage:   "b",
+			OffsetComment: "offset_chanel",
 			Expected: `
 func TestChanel(t *testing.T) {
 	type input struct {
@@ -299,9 +299,9 @@ func TestChanel(t *testing.T) {
 }`,
 		},
 		{
-			Name:        "mystruct func",
-			TestPackage: "b",
-			Offset:      459,
+			Name:          "mystruct func",
+			TestPackage:   "b",
+			OffsetComment: "offset_myStructFunc",
 			Expected: `
 func TestMyStructFunc(t *testing.T) {
 	type input struct {
@@ -325,9 +325,9 @@ func TestMyStructFunc(t *testing.T) {
 }`,
 		},
 		{
-			Name:        "struct func",
-			TestPackage: "c",
-			Offset:      57,
+			Name:          "struct func",
+			TestPackage:   "c",
+			OffsetComment: "offset_structFunc",
 			Expected: `
 func TestStructFunc(t *testing.T) {
 	type input struct {
@@ -351,9 +351,9 @@ func TestStructFunc(t *testing.T) {
 }`,
 		},
 		{
-			Name:        "interface func",
-			TestPackage: "c",
-			Offset:      129,
+			Name:          "interface func",
+			TestPackage:   "c",
+			OffsetComment: "offset_interfaceFunc",
 			Expected: `
 func TestInterfaceFunc(t *testing.T) {
 	type input struct {
@@ -382,7 +382,7 @@ func TestInterfaceFunc(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			buffer := &bytes.Buffer{}
 			gentest.SetWriter(buffer)
-			gentest.SetOffset(test.Offset)
+			gentest.SetOffsetComent(test.OffsetComment)
 			analysistest.Run(t, testdata, gentest.Analyzer, test.TestPackage)
 			assert.Equal(t, test.Expected, buffer.String())
 		})

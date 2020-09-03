@@ -19,7 +19,8 @@ import (
 const doc = "gentest is ..."
 
 var writer io.Writer
-var offset int // -offset flag
+var offset int           // -offset flag
+var offsetComment string // for test
 
 // Analyzer is ...
 var Analyzer = &analysis.Analyzer{
@@ -65,6 +66,14 @@ func fprint(a ...interface{}) {
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
+	var err error
+	if offsetComment != "" {
+		offset, err = getOffsetByComment(pass, offsetComment)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	funcDecl, err := findTargetFunc(pass)
 	if err != nil {
 		return nil, err
@@ -94,6 +103,24 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	outputTestCode(of)
 
 	return nil, nil
+}
+
+func getOffsetByComment(pass *analysis.Pass, targetComment string) (int, error) {
+	targetComment += "\n"
+	for _, file := range pass.Files {
+		for _, decl := range file.Decls {
+			funcDecl, _ := decl.(*ast.FuncDecl)
+			if funcDecl == nil || funcDecl.Doc == nil {
+				continue
+			}
+
+			if funcDecl.Doc.Text() == targetComment {
+				return pass.Fset.Position(funcDecl.Name.Pos()).Offset, nil
+			}
+		}
+	}
+
+	return 0, fmt.Errorf("faild to get offset by comment: %s", targetComment)
 }
 
 func findTargetFunc(pass *analysis.Pass) (*ast.FuncDecl, error) {
