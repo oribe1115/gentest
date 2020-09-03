@@ -37,6 +37,7 @@ type outputField struct {
 	ExpectedStruct string
 	TestCasesDef   string
 	ExecBaseFunc   string
+	AssertEqual    string
 }
 
 type baseFuncData struct {
@@ -84,6 +85,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	of.ExpectedStruct = genExpectedStruct(baseFunc)
 	of.TestCasesDef = genTestCasesDef(baseFunc)
 	of.ExecBaseFunc, err = genExecBaseCode(baseFunc)
+	of.AssertEqual = genAssertEqual(baseFunc)
 	if err != nil {
 		return nil, err
 	}
@@ -222,6 +224,15 @@ func genTestCasesDef(bf *baseFuncData) string {
 	result += "}{}"
 	return result
 }
+func genAssertEqual(be *baseFuncData) string {
+	assrts := make([]string, 0)
+	for _, v := range be.Results {
+		as := fmt.Sprintf("assert.Equal(t, test.Expected.%s, %s)", v.Name, v.Name)
+		assrts = append(assrts, as)
+	}
+
+	return strings.Join(assrts, "\n")
+}
 
 func outputTestCode(of *outputField) error {
 	testCodeTemplate := `
@@ -231,6 +242,7 @@ func {{.TestFuncName}}(t *testing.T){
 	for _, test := range tests {
 		t.Run("LABEL", func(t *testing.T) {
 			{{.ExecBaseFunc}}
+			{{.AssertEqual}}
 		})
 	}
 }`
@@ -242,6 +254,7 @@ func {{.TestFuncName}}(t *testing.T){
 		"ExpectedStruct": of.ExpectedStruct,
 		"TestCasesDef":   of.TestCasesDef,
 		"ExecBaseFunc":   of.ExecBaseFunc,
+		"AssertEqual":    of.AssertEqual,
 	}
 
 	t, err := template.New("base").Parse(testCodeTemplate)

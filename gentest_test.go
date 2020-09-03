@@ -30,6 +30,7 @@ func TestF(t *testing.T) {
 	for _, test := range tests {
 		t.Run("LABEL", func(t *testing.T) {
 			f()
+
 		})
 	}
 }`,
@@ -47,6 +48,7 @@ func TestReturnInt(t *testing.T) {
 	for _, test := range tests {
 		t.Run("LABEL", func(t *testing.T) {
 			gotint := returnInt()
+			assert.Equal(t, test.Expected.gotint, gotint)
 		})
 	}
 }`,
@@ -65,6 +67,8 @@ func TestReturnInts(t *testing.T) {
 	for _, test := range tests {
 		t.Run("LABEL", func(t *testing.T) {
 			gotint, gotint2 := returnInts()
+			assert.Equal(t, test.Expected.gotint, gotint)
+			assert.Equal(t, test.Expected.gotint2, gotint2)
 		})
 	}
 }`,
