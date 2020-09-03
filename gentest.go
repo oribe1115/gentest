@@ -160,6 +160,44 @@ func (bf *baseFuncData) setSignature(pass *analysis.Pass) error {
 	return nil
 }
 
+func typeToVarName(t types.Type) string {
+	var name string
+	switch t := t.(type) {
+	case *types.Array:
+		if elem, _ := t.Elem().(*types.Basic); elem != nil {
+			name = elem.Name() + "List"
+		} else {
+			name = "list"
+		}
+	case *types.Slice:
+		if elem, _ := t.Elem().(*types.Basic); elem != nil {
+			name = elem.Name() + "List"
+		} else {
+			name = "list"
+		}
+	case *types.Map:
+		name = "mp"
+	case *types.Pointer:
+		if elem, _ := t.Elem().(*types.Basic); elem != nil {
+			name = "p" + elem.Name()
+		} else {
+			name = "p"
+		}
+	case *types.Signature:
+		name = "fn"
+	case *types.Chan:
+		name = "ch"
+	case *types.Named:
+		name = strings.ReplaceAll(t.String(), ".", "")
+	case *types.Struct:
+		name = strings.ReplaceAll(t.String(), ".", "")
+	default:
+		name = t.String()
+	}
+
+	return name
+}
+
 func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, int) {
 	varFields := make([]*varField, 0)
 	nameMap := map[string]int{}
@@ -172,38 +210,7 @@ func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, int) {
 		name := v.Name()
 
 		if name == "" {
-			switch vType := v.Type().(type) {
-			case *types.Array:
-				if elem, _ := vType.Elem().(*types.Basic); elem != nil {
-					name = elem.Name() + "List"
-				} else {
-					name = "list"
-				}
-			case *types.Slice:
-				if elem, _ := vType.Elem().(*types.Basic); elem != nil {
-					name = elem.Name() + "List"
-				} else {
-					name = "list"
-				}
-			case *types.Map:
-				name = "mp"
-			case *types.Pointer:
-				if elem, _ := vType.Elem().(*types.Basic); elem != nil {
-					name = "p" + elem.Name()
-				} else {
-					name = "p"
-				}
-			case *types.Signature:
-				name = "fn"
-			case *types.Chan:
-				name = "ch"
-			case *types.Named:
-				name = strings.ReplaceAll(vType.String(), ".", "")
-			case *types.Struct:
-				name = strings.ReplaceAll(vType.String(), ".", "")
-			default:
-				name = typeString
-			}
+			name = typeToVarName(v.Type())
 		}
 
 		name = prefix + name
