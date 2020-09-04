@@ -500,6 +500,7 @@ func {{.TestFuncName}}(t *testing.T){
 	{{.InputStruct}}
 	{{.ExpectedStruct}}
 	{{.TestCasesDef}}
+	
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 			{{.Parallel}}
