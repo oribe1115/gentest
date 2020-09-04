@@ -22,6 +22,7 @@ const doc = "gentest is ..."
 var writer io.Writer
 var offset int           // -offset flag
 var offsetComment string // for test
+var parallelMode bool    // -parallel flag
 
 // Analyzer is ...
 var Analyzer = &analysis.Analyzer{
@@ -41,6 +42,8 @@ type outputField struct {
 	TestCasesDef   string
 	ExecBaseFunc   string
 	Asserts        string
+	Parallel       string
+	Cleanup        string
 }
 
 type baseFuncData struct {
@@ -62,6 +65,7 @@ type varField struct {
 func init() {
 	writer = os.Stdout
 	Analyzer.Flags.IntVar(&offset, "offset", offset, "offset")
+	Analyzer.Flags.BoolVar(&parallelMode, "parallel", false, "parallel")
 }
 
 func fprint(a ...interface{}) {
@@ -104,6 +108,9 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	of.genParalles(baseFunc)
+
 	err = outputTestCode(of)
 	if err != nil {
 		return nil, err
@@ -370,11 +377,11 @@ func genTestCasesDef(bf *baseFuncData) string {
 
 	return "tests := []struct{" + strings.Join(elements, "\n") + "}{}"
 }
-func genAsserts(be *baseFuncData) string {
+func genAsserts(bf *baseFuncData) string {
 	checkErrs := make([]string, 0)
 	equals := make([]string, 0)
 
-	for _, v := range be.Results {
+	for _, v := range bf.Results {
 		if v.IsError {
 			checkErr := fmt.Sprintf(`
 			if test.wantError {
@@ -396,14 +403,26 @@ func genAsserts(be *baseFuncData) string {
 	return strings.Join(checkErrs, "") + "\n" + strings.Join(equals, "\n")
 }
 
+func (of *outputField) genParalles(bf *baseFuncData) {
+	if !parallelMode {
+		return
+	}
+
+	of.Parallel = "t.Parallel()"
+	of.Cleanup = "t.Cleanup()\n"
+}
+
 func outputTestCode(of *outputField) error {
 	testCodeTemplate := `
 func {{.TestFuncName}}(t *testing.T){
+	{{.Parallel}}
 	{{.InputStruct}}
 	{{.ExpectedStruct}}
 	{{.TestCasesDef}}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+			{{.Parallel}}
+			{{.Cleanup}}
 			{{.ExecBaseFunc}}
 			{{.Asserts}}
 		})
@@ -419,6 +438,8 @@ func {{.TestFuncName}}(t *testing.T){
 		"TestCasesDef":   of.TestCasesDef,
 		"ExecBaseFunc":   of.ExecBaseFunc,
 		"Asserts":        of.Asserts,
+		"Parallel":       of.Parallel,
+		"Cleanup":        of.Cleanup,
 	}
 
 	t, err := template.New("base").Parse(testCodeTemplate)

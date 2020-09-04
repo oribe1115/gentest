@@ -17,6 +17,7 @@ func TestAnalyzer(t *testing.T) {
 		Name          string
 		TestPackage   string
 		OffsetComment string
+		Parallel      bool
 		Expected      string
 	}{
 		{
@@ -29,6 +30,7 @@ func TestF(t *testing.T) {
 	tests := []struct{ Name string }{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			f()
 
 		})
@@ -51,6 +53,7 @@ func TestReturnInt(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			gotint := returnInt()
 
 			assert.Equal(t, test.Expected.gotint, gotint)
@@ -75,6 +78,7 @@ func TestReturnInts(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			gotint, gotint2 := returnInts()
 
 			assert.Equal(t, test.Expected.gotint, gotint)
@@ -101,6 +105,7 @@ func TestReturnIntError(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			gotint, goterror := returnIntError()
 
 			if test.wantError {
@@ -123,6 +128,7 @@ func TestReturnIntError(t *testing.T) {
 			OffsetComment: "offset_inputInts",
 			Expected: `
 func TestInputInts(t *testing.T) {
+
 	type input struct {
 		a int
 		b int
@@ -134,6 +140,7 @@ func TestInputInts(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			inputInts(test.Input.a, test.Input.b)
 
 		})
@@ -146,6 +153,7 @@ func TestInputInts(t *testing.T) {
 			OffsetComment: "offset_intList",
 			Expected: `
 func TestIntList(t *testing.T) {
+
 	type input struct {
 		list []int
 	}
@@ -159,6 +167,7 @@ func TestIntList(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			gotintList := intList(test.Input.list)
 
 			assert.Equal(t, test.Expected.gotintList, gotintList)
@@ -172,6 +181,7 @@ func TestIntList(t *testing.T) {
 			OffsetComment: "offset_mapFunc",
 			Expected: `
 func TestMapFunc(t *testing.T) {
+
 	type input struct {
 		input map[int]string
 	}
@@ -186,6 +196,7 @@ func TestMapFunc(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			gotmp, gotmp2 := mapFunc(test.Input.input)
 
 			assert.Equal(t, test.Expected.gotmp, gotmp)
@@ -200,6 +211,7 @@ func TestMapFunc(t *testing.T) {
 			OffsetComment: "offset_pointer",
 			Expected: `
 func TestPointer(t *testing.T) {
+
 	type input struct {
 		input *string
 	}
@@ -213,6 +225,7 @@ func TestPointer(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			gotpstring := pointer(test.Input.input)
 
 			assert.Equal(t, test.Expected.gotpstring, gotpstring)
@@ -226,6 +239,7 @@ func TestPointer(t *testing.T) {
 			OffsetComment: "offset_pointerList",
 			Expected: `
 func TestPointerList(t *testing.T) {
+
 	type input struct {
 		input []*string
 	}
@@ -239,6 +253,7 @@ func TestPointerList(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			gotlist := pointerList(test.Input.input)
 
 			assert.Equal(t, test.Expected.gotlist, gotlist)
@@ -252,6 +267,7 @@ func TestPointerList(t *testing.T) {
 			OffsetComment: "offset_function",
 			Expected: `
 func TestFunction(t *testing.T) {
+
 	type input struct {
 		input func(i int) string
 	}
@@ -265,6 +281,7 @@ func TestFunction(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			gotfn := function(test.Input.input)
 
 			assert.Equal(t, test.Expected.gotfn, gotfn)
@@ -278,6 +295,7 @@ func TestFunction(t *testing.T) {
 			OffsetComment: "offset_chanel",
 			Expected: `
 func TestChanel(t *testing.T) {
+
 	type input struct {
 		input chan int
 	}
@@ -291,6 +309,7 @@ func TestChanel(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			gotch := chanel(test.Input.input)
 
 			assert.Equal(t, test.Expected.gotch, gotch)
@@ -304,6 +323,7 @@ func TestChanel(t *testing.T) {
 			OffsetComment: "offset_myStructFunc",
 			Expected: `
 func TestMyStructFunc(t *testing.T) {
+
 	type input struct {
 		ms b.myStruct
 	}
@@ -317,6 +337,7 @@ func TestMyStructFunc(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			gotmyStruct := myStructFunc(test.Input.ms)
 
 			assert.Equal(t, test.Expected.gotmyStruct, gotmyStruct)
@@ -330,6 +351,7 @@ func TestMyStructFunc(t *testing.T) {
 			OffsetComment: "offset_basicStruct",
 			Expected: `
 func TestBasicStruct(t *testing.T) {
+
 	type input struct {
 		input struct{ name string }
 	}
@@ -343,6 +365,7 @@ func TestBasicStruct(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			gotst := basicStruct(test.Input.input)
 
 			assert.Equal(t, test.Expected.gotst, gotst)
@@ -356,6 +379,7 @@ func TestBasicStruct(t *testing.T) {
 			OffsetComment: "offset_basicInterface",
 			Expected: `
 func TestBasicInterface(t *testing.T) {
+
 	type input struct {
 		input interface{ hoge() }
 	}
@@ -369,6 +393,7 @@ func TestBasicInterface(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			gotin := basicInterface(test.Input.input)
 
 			assert.Equal(t, test.Expected.gotin, gotin)
@@ -382,6 +407,7 @@ func TestBasicInterface(t *testing.T) {
 			OffsetComment: "offset_namedStruct",
 			Expected: `
 func TestNamedStruct(t *testing.T) {
+
 	type input struct {
 		input context.Context
 	}
@@ -395,6 +421,7 @@ func TestNamedStruct(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			gotcontext := namedStruct(test.Input.input)
 
 			assert.Equal(t, test.Expected.gotcontext, gotcontext)
@@ -408,6 +435,7 @@ func TestNamedStruct(t *testing.T) {
 			OffsetComment: "offset_namedInterface",
 			Expected: `
 func TestNamedInterface(t *testing.T) {
+
 	type input struct {
 		input http.Handler
 	}
@@ -421,6 +449,7 @@ func TestNamedInterface(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			gothandler := namedInterface(test.Input.input)
 
 			assert.Equal(t, test.Expected.gothandler, gothandler)
@@ -441,6 +470,7 @@ func TestBasicRecv(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			test.Use.basicRecv()
 
 		})
@@ -460,7 +490,29 @@ func TestPointerRecv(t *testing.T) {
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
+
 			test.Use.pointerRecv()
+
+		})
+	}
+}`,
+		},
+		{
+			Name:          "simple func with parallel",
+			TestPackage:   "a",
+			OffsetComment: "offset_f",
+			Parallel:      true,
+			Expected: `
+func TestF(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct{ Name string }{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			t.Parallel()
+			t.Cleanup()
+
+			f()
 
 		})
 	}
@@ -473,6 +525,7 @@ func TestPointerRecv(t *testing.T) {
 			buffer := &bytes.Buffer{}
 			gentest.SetWriter(buffer)
 			gentest.SetOffsetComent(test.OffsetComment)
+			gentest.SetPrallelMode(test.Parallel)
 			analysistest.Run(t, testdata, gentest.Analyzer, test.TestPackage)
 			assert.Equal(t, test.Expected, buffer.String())
 		})

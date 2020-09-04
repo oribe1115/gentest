@@ -11,3 +11,7 @@ func SetWriter(testWriter io.Writer) {
 func SetOffsetComent(oc string) {
 	offsetComment = oc
 }
+
+func SetPrallelMode(pm bool) {
+	parallelMode = pm
+}
