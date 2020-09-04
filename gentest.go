@@ -100,16 +100,12 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	baseFunc.setRecvChenged(pass)
 
 	of := &outputField{}
-	of.TestFuncName = genTestFuncName(funcDecl.Name.String())
-	of.InputStruct = genInputStruct(baseFunc)
-	of.ExpectedStruct = genExpectedStruct(baseFunc)
-	of.TestCasesDef = genTestCasesDef(baseFunc)
-	of.ExecBaseFunc, err = genExecBaseCode(baseFunc)
-	of.Asserts = genAsserts(baseFunc)
-	if err != nil {
-		return nil, err
-	}
-
+	of.genTestFuncName(baseFunc)
+	of.genInputStruct(baseFunc)
+	of.genExpectedStruct(baseFunc)
+	of.genTestCasesDef(baseFunc)
+	of.genExecBaseCode(baseFunc)
+	of.genAsserts(baseFunc)
 	of.genParalles(baseFunc)
 
 	err = outputTestCode(of)
@@ -157,16 +153,19 @@ func findTargetFunc(pass *analysis.Pass) (*ast.FuncDecl, error) {
 	return nil, fmt.Errorf("not found function with offset %d", offset)
 }
 
-func genTestFuncName(funcName string) string {
-	startWithUpper := strings.ToUpper(string(funcName[0]))
-	if len(funcName) > 1 {
-		startWithUpper += funcName[1:]
+func startWithUpper(base string) string {
+	result := strings.ToUpper(string(base[0]))
+	if len(base) > 1 {
+		result += base[1:]
 	}
-	return "Test" + startWithUpper
+	return result
 }
 
-func genExecBaseCode(bf *baseFuncData) (string, error) {
-	var result string
+func (of *outputField) genTestFuncName(bf *baseFuncData) {
+	of.TestFuncName = "Test" + startWithUpper(bf.FuncDecl.Name.Name)
+}
+
+func (of *outputField) genExecBaseCode(bf *baseFuncData) {
 	funcName := bf.FuncDecl.Name.String()
 
 	var use string
@@ -174,12 +173,13 @@ func genExecBaseCode(bf *baseFuncData) (string, error) {
 		use = "test.Use."
 	}
 
+	var results string
 	resultNames := make([]string, 0)
 	for _, re := range bf.Results {
 		resultNames = append(resultNames, re.Name)
 	}
 	if len(resultNames) != 0 {
-		result += strings.Join(resultNames, ",") + ":="
+		results = strings.Join(resultNames, ",") + ":="
 	}
 
 	paramNames := make([]string, 0)
@@ -187,9 +187,9 @@ func genExecBaseCode(bf *baseFuncData) (string, error) {
 		input := fmt.Sprintf("test.Input.%s", param.Name)
 		paramNames = append(paramNames, input)
 	}
+	params := strings.Join(paramNames, ",")
 
-	result += fmt.Sprintf("%s%s(%s)", use, funcName, strings.Join(paramNames, ","))
-	return result, nil
+	of.ExecBaseFunc = fmt.Sprintf("%s %s%s(%s)", results, use, funcName, params)
 }
 
 func (bf *baseFuncData) setSignature(pass *analysis.Pass) error {
@@ -329,32 +329,43 @@ func (bf *baseFuncData) setRecv() {
 	}
 }
 
-func genInputStruct(bf *baseFuncData) string {
+func (of *outputField) genInputStruct(bf *baseFuncData) {
 	if len(bf.Params) == 0 {
-		return ""
+		return
 	}
-	result := "type input struct {\n"
+
+	paramDefs := make([]string, 0)
 	for _, param := range bf.Params {
-		result += fmt.Sprintf("%s %s\n", param.Name, param.TypeName)
+		paramDef := fmt.Sprintf("%s %s", param.Name, param.TypeName)
+		paramDefs = append(paramDefs, paramDef)
 	}
-	result += "}"
-	return result
+
+	of.InputStruct = fmt.Sprintf(
+		`type input struct {
+			%s
+		}`,
+		strings.Join(paramDefs, "\n"))
 }
 
-func genExpectedStruct(bf *baseFuncData) string {
+func (of *outputField) genExpectedStruct(bf *baseFuncData) {
 	if len(bf.Results) == 0 {
-		return ""
+		return
 	}
-	result := "type expected struct {\n"
-	for _, re := range bf.Results {
-		result += fmt.Sprintf("%s %s\n", re.Name, re.TypeName)
-	}
-	result += "}"
 
-	return result
+	expectedDefs := make([]string, 0)
+	for _, re := range bf.Results {
+		expectedDef := fmt.Sprintf("%s %s", re.Name, re.TypeName)
+		expectedDefs = append(expectedDefs, expectedDef)
+	}
+
+	of.ExpectedStruct = fmt.Sprintf(
+		`type expected struct {
+			%s
+		}`,
+		strings.Join(expectedDefs, "\n"))
 }
 
-func genTestCasesDef(bf *baseFuncData) string {
+func (of *outputField) genTestCasesDef(bf *baseFuncData) {
 	elements := make([]string, 0)
 	name := "Name string"
 	elements = append(elements, name)
@@ -384,9 +395,14 @@ func genTestCasesDef(bf *baseFuncData) string {
 		elements = append(elements, useExpected)
 	}
 
-	return "tests := []struct{" + strings.Join(elements, "\n") + "}{}"
+	of.TestCasesDef = fmt.Sprintf(
+		`tests := []struct{
+			%s
+		}{}`,
+		strings.Join(elements, "\n"))
 }
-func genAsserts(bf *baseFuncData) string {
+
+func (of *outputField) genAsserts(bf *baseFuncData) {
 	checkErrs := make([]string, 0)
 	equals := make([]string, 0)
 
@@ -414,7 +430,7 @@ func genAsserts(bf *baseFuncData) string {
 		equals = append(equals, useEq)
 	}
 
-	return strings.Join(checkErrs, "") + "\n" + strings.Join(equals, "\n")
+	of.Asserts = strings.Join(checkErrs, "") + "\n" + strings.Join(equals, "\n")
 }
 
 func (of *outputField) genParalles(bf *baseFuncData) {
