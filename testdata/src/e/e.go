@@ -4,14 +4,14 @@ type T struct {
 	Hoge string
 }
 
-type P struct {
-	Po string
-}
+/* -----UseExpectedを生成する----- */
 
 // offset_assign
 func (t *T) assgin() {
 	t.Hoge = "hoge"
 }
+
+/* -----UseExpectedを生成しない----- */
 
 // offset_sameTypeDiffVar
 func (t *T) sameTypeDiffVar() {
