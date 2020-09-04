@@ -1,0 +1,32 @@
+
+func TestNamedResults(t *testing.T) {
+
+	type expected struct {
+		gotZero int
+		gotErr  error
+	}
+	tests := []struct {
+		Name      string
+		Expected  expected
+		WantError bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			gotZero, gotErr := namedResults()
+
+			if test.WantError {
+				assert.Error(t, gotErr)
+				if test.Expected.gotErr != nil {
+					assert.EqualError(t, gotErr, test.Expected.gotErr.String())
+				}
+			} else {
+				assert.NoError(t, gotErr)
+			}
+
+			assert.Equal(t, test.Expected.gotZero, gotZero)
+		})
+	}
+}

@@ -144,6 +144,10 @@ func TestAnalyzer(t *testing.T) {
 			Name:          "assignInGoFunc",
 			TestPackage:   "e",
 			OffsetComment: "offset_assignInGoFunc",
+		}, {
+			Name:          "namedResults",
+			TestPackage:   "f",
+			OffsetComment: "offset_namedResults",
 		},
 	}
 
