@@ -21,7 +21,7 @@ func TestAnalyzer(t *testing.T) {
 		Expected      string
 	}{
 		{
-			Name:          "simple func",
+			Name:          "f",
 			TestPackage:   "a",
 			OffsetComment: "offset_f",
 			Expected: `
@@ -38,7 +38,7 @@ func TestF(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "simple int func",
+			Name:          "returnInt",
 			TestPackage:   "a",
 			OffsetComment: "offset_returnInt",
 			Expected: `
@@ -62,7 +62,7 @@ func TestReturnInt(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "multi int func",
+			Name:          "returnInts",
 			TestPackage:   "a",
 			OffsetComment: "offset_returnInts",
 			Expected: `
@@ -88,7 +88,7 @@ func TestReturnInts(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "int and error func",
+			Name:          "returnIntError",
 			TestPackage:   "a",
 			OffsetComment: "offset_returnIntError",
 			Expected: `
@@ -123,7 +123,7 @@ func TestReturnIntError(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "input ints",
+			Name:          "inputInts",
 			TestPackage:   "a",
 			OffsetComment: "offset_inputInts",
 			Expected: `
@@ -148,7 +148,7 @@ func TestInputInts(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "intlist func",
+			Name:          "intList",
 			TestPackage:   "b",
 			OffsetComment: "offset_intList",
 			Expected: `
@@ -176,7 +176,7 @@ func TestIntList(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "map func",
+			Name:          "mapFunc",
 			TestPackage:   "b",
 			OffsetComment: "offset_mapFunc",
 			Expected: `
@@ -206,7 +206,7 @@ func TestMapFunc(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "pointer func",
+			Name:          "pointer",
 			TestPackage:   "b",
 			OffsetComment: "offset_pointer",
 			Expected: `
@@ -234,7 +234,7 @@ func TestPointer(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "pointer func",
+			Name:          "pointerList",
 			TestPackage:   "b",
 			OffsetComment: "offset_pointerList",
 			Expected: `
@@ -262,7 +262,7 @@ func TestPointerList(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "function func",
+			Name:          "function",
 			TestPackage:   "b",
 			OffsetComment: "offset_function",
 			Expected: `
@@ -290,7 +290,7 @@ func TestFunction(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "chanel func",
+			Name:          "chanel",
 			TestPackage:   "b",
 			OffsetComment: "offset_chanel",
 			Expected: `
@@ -318,7 +318,7 @@ func TestChanel(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "mystruct func",
+			Name:          "myStructFunc",
 			TestPackage:   "b",
 			OffsetComment: "offset_myStructFunc",
 			Expected: `
@@ -346,7 +346,7 @@ func TestMyStructFunc(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "basic struct func",
+			Name:          "basicStruct",
 			TestPackage:   "c",
 			OffsetComment: "offset_basicStruct",
 			Expected: `
@@ -374,7 +374,7 @@ func TestBasicStruct(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "basic interface func",
+			Name:          "basicInterface",
 			TestPackage:   "c",
 			OffsetComment: "offset_basicInterface",
 			Expected: `
@@ -402,7 +402,7 @@ func TestBasicInterface(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "named struct func",
+			Name:          "namedStruct",
 			TestPackage:   "c",
 			OffsetComment: "offset_namedStruct",
 			Expected: `
@@ -430,7 +430,7 @@ func TestNamedStruct(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "named interface func",
+			Name:          "namedInterface",
 			TestPackage:   "c",
 			OffsetComment: "offset_namedInterface",
 			Expected: `
@@ -458,7 +458,7 @@ func TestNamedInterface(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "basic reciever func",
+			Name:          "basicRecv",
 			TestPackage:   "d",
 			OffsetComment: "offset_basicRecv",
 			Expected: `
@@ -478,7 +478,7 @@ func TestBasicRecv(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "pointer reciever func",
+			Name:          "pointerRecv",
 			TestPackage:   "d",
 			OffsetComment: "offset_pointerRecv",
 			Expected: `
@@ -498,12 +498,12 @@ func TestPointerRecv(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "simple func with parallel",
-			TestPackage:   "a",
-			OffsetComment: "offset_f",
+			Name:          "parallel",
+			TestPackage:   "d",
+			OffsetComment: "offset_paralell",
 			Parallel:      true,
 			Expected: `
-func TestF(t *testing.T) {
+func TestParallel(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct{ Name string }{}
@@ -512,14 +512,14 @@ func TestF(t *testing.T) {
 			t.Parallel()
 			t.Cleanup()
 
-			f()
+			parallel()
 
 		})
 	}
 }`,
 		},
 		{
-			Name:          "simple recv changed func",
+			Name:          "assign",
 			TestPackage:   "e",
 			OffsetComment: "offset_assign",
 			Expected: `
@@ -541,7 +541,7 @@ func TestAssgin(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "directly recv changed func",
+			Name:          "recvChangedDirect",
 			TestPackage:   "e",
 			OffsetComment: "offset_recvChangedDirect",
 			Expected: `
@@ -563,7 +563,7 @@ func TestRecvChangedDirect(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "same type not recv changed func",
+			Name:          "sameTypeDiffVar",
 			TestPackage:   "e",
 			OffsetComment: "offset_sameTypeDiffVar",
 			Expected: `
@@ -583,7 +583,7 @@ func TestSameTypeDiffVar(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "chenged in called method func",
+			Name:          "assignInMethod",
 			TestPackage:   "e",
 			OffsetComment: "offset_assignInMethod",
 			Expected: `
@@ -603,7 +603,7 @@ func TestAssignInMethod(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "chenged in called function func",
+			Name:          "assignInFunc",
 			TestPackage:   "e",
 			OffsetComment: "offset_assignInFunc",
 			Expected: `
@@ -623,7 +623,7 @@ func TestAssignInFunc(t *testing.T) {
 }`,
 		},
 		{
-			Name:          "chenged in called go func func",
+			Name:          "assignInGoFunc",
 			TestPackage:   "e",
 			OffsetComment: "offset_assignInGoFunc",
 			Expected: `
