@@ -55,7 +55,14 @@ func TestHello(t *testing.T) {
 }
 ```
 
-## フラグ
+## Flags
 
-- `offset`: 対象となる関数のオフセット 必須
-- `paralell`: trueにセットすると`t.Parallel`を追加したテストコードを生成する　オプション
+### gentest.offset
+Essential flag
+Target function is searched by this
+Default: `0`
+
+### gentest.paralell
+Optional flag
+If parallel is `true`, generated test code contains t.Parallel and t.Cleanup
+Default: `false`

@@ -16,7 +16,7 @@ import (
 	"golang.org/x/tools/go/analysis/passes/inspect"
 )
 
-const doc = "gentest is ..."
+const doc = "gentest is test code generator"
 
 var writer io.Writer
 var offset int           // -offset flag
@@ -64,8 +64,8 @@ type varField struct {
 
 func init() {
 	writer = os.Stdout
-	Analyzer.Flags.IntVar(&offset, "offset", offset, "offset")
-	Analyzer.Flags.BoolVar(&parallelMode, "parallel", false, "parallel")
+	Analyzer.Flags.IntVar(&offset, "offset", offset, "essential flag: target function is searched by offset")
+	Analyzer.Flags.BoolVar(&parallelMode, "parallel", false, "optional flag: if parallel is true, generated test code contains t.Parallel")
 }
 
 func fprint(a ...interface{}) {
