@@ -376,7 +376,7 @@ func genTestCasesDef(bf *baseFuncData) string {
 	}
 
 	if bf.ResultErrorCount != 0 {
-		want := "wantError bool"
+		want := "WantError bool"
 		elements = append(elements, want)
 	}
 
@@ -394,7 +394,7 @@ func genAsserts(bf *baseFuncData) string {
 	for _, v := range bf.Results {
 		if v.IsError {
 			checkErr := fmt.Sprintf(`
-			if test.wantError {
+			if test.WantError {
 				assert.Error(t, %s)
 				if test.Expected.%s != nil {
 					assert.EqualError(t, %s, test.Expected.%s.String())

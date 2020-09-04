@@ -101,14 +101,14 @@ func TestReturnIntError(t *testing.T) {
 	tests := []struct {
 		Name      string
 		Expected  expected
-		wantError bool
+		WantError bool
 	}{}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 
 			gotint, goterror := returnIntError()
 
-			if test.wantError {
+			if test.WantError {
 				assert.Error(t, goterror)
 				if test.Expected.goterror != nil {
 					assert.EqualError(t, goterror, test.Expected.goterror.String())
