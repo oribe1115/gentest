@@ -16,6 +16,7 @@ func TestPointer(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		test := test
 		t.Run(test.Name, func(t *testing.T) {
 
 			gotPstring := pointer(test.Input.input)

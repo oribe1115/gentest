@@ -156,6 +156,7 @@ func TestAnalyzer(t *testing.T) {
 	)
 
 	for _, test := range tests {
+		test := test
 		t.Run(test.Name, func(t *testing.T) {
 			buffer := &bytes.Buffer{}
 			gentest.SetWriter(buffer)

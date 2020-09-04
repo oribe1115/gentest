@@ -16,6 +16,7 @@ func TestFunction(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		test := test
 		t.Run(test.Name, func(t *testing.T) {
 
 			gotFn := function(test.Input.input)

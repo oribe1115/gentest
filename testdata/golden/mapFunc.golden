@@ -17,6 +17,7 @@ func TestMapFunc(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		test := test
 		t.Run(test.Name, func(t *testing.T) {
 
 			gotMp, gotMp2 := mapFunc(test.Input.input)
