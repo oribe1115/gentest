@@ -518,6 +518,48 @@ func TestF(t *testing.T) {
 	}
 }`,
 		},
+		{
+			Name:          "simple recv changed func",
+			TestPackage:   "e",
+			OffsetComment: "offset_assign",
+			Expected: `
+func TestAssgin(t *testing.T) {
+
+	tests := []struct {
+		Name        string
+		Use         *e.T
+		UseExpected *e.T
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			test.Use.assgin()
+
+			assert.Equal(t, test.UseExpected, test.Use)
+		})
+	}
+}`,
+		},
+		{
+			Name:          "same type not recv changed func",
+			TestPackage:   "e",
+			OffsetComment: "offset_sameTypeDiffVar",
+			Expected: `
+func TestSameTypeDiffVar(t *testing.T) {
+
+	tests := []struct {
+		Name string
+		Use  *e.T
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			test.Use.sameTypeDiffVar()
+
+		})
+	}
+}`,
+		},
 	}
 
 	for _, test := range tests {

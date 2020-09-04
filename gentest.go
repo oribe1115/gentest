@@ -53,6 +53,7 @@ type baseFuncData struct {
 	Results          []*varField
 	ResultErrorCount int
 	Recv             *varField
+	IsRecvChenged    bool
 }
 
 type varField struct {
@@ -97,6 +98,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	baseFunc.setReturns()
 	baseFunc.setParams()
 	baseFunc.setRecv()
+	baseFunc.setRecvChenged(pass)
 
 	of := &outputField{}
 	of.TestFuncName = genTestFuncName(funcDecl.Name.String())
@@ -375,6 +377,11 @@ func genTestCasesDef(bf *baseFuncData) string {
 		elements = append(elements, want)
 	}
 
+	if bf.IsRecvChenged {
+		useExpected := fmt.Sprintf("UseExpected %s", bf.Recv.TypeName)
+		elements = append(elements, useExpected)
+	}
+
 	return "tests := []struct{" + strings.Join(elements, "\n") + "}{}"
 }
 func genAsserts(bf *baseFuncData) string {
@@ -400,6 +407,11 @@ func genAsserts(bf *baseFuncData) string {
 		}
 	}
 
+	if bf.IsRecvChenged {
+		useEq := "assert.Equal(t, test.UseExpected, test.Use)"
+		equals = append(equals, useEq)
+	}
+
 	return strings.Join(checkErrs, "") + "\n" + strings.Join(equals, "\n")
 }
 
@@ -410,6 +422,49 @@ func (of *outputField) genParalles(bf *baseFuncData) {
 
 	of.Parallel = "t.Parallel()"
 	of.Cleanup = "t.Cleanup()\n"
+}
+
+func (bf *baseFuncData) setRecvChenged(pass *analysis.Pass) {
+	if bf.Recv == nil {
+		return
+	}
+	r, _ := bf.Recv.Type.(*types.Pointer)
+	if r == nil {
+		return
+	}
+
+	recvIdent := bf.FuncDecl.Recv.List[0].Names[0]
+	recvType := pass.TypesInfo.TypeOf(recvIdent)
+
+	var changed bool
+
+	ast.Inspect(bf.FuncDecl.Body, func(n ast.Node) bool {
+		if changed {
+			return false
+		}
+
+		switch n := n.(type) {
+		case *ast.AssignStmt:
+			for _, expr := range n.Lhs {
+				selExpr, _ := expr.(*ast.SelectorExpr)
+				if selExpr == nil {
+					continue
+				}
+				x, _ := selExpr.X.(*ast.Ident)
+				if x == nil {
+					continue
+				}
+
+				xType := pass.TypesInfo.TypeOf(x)
+				if types.Identical(xType, recvType) && x.Name == recvIdent.Name {
+					changed = true
+				}
+			}
+		}
+		return true
+	})
+
+	bf.IsRecvChenged = changed
 }
 
 func outputTestCode(of *outputField) error {
