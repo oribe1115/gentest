@@ -16,6 +16,13 @@ func (t *T) recvChangedDirect() {
 	t = &T{}
 }
 
+// offset_assignInGoFunc
+func (t *T) assignInGoFunc() {
+	go func() {
+		t.Hoge = "hoge"
+	}()
+}
+
 /* -----UseExpectedを生成しない----- */
 
 // offset_sameTypeDiffVar
@@ -38,9 +45,3 @@ func (t *T) assignInFunc() {
 	setHoge(t)
 }
 
-// offset_assignInGoFunc
-func (t *T) assignInGoFunc() {
-	go func() {
-		t.Hoge = "hoge"
-	}()
-}
