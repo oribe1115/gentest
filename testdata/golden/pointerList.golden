@@ -1,0 +1,23 @@
+
+func TestPointerList(t *testing.T) {
+
+	type input struct {
+		input []*string
+	}
+	type expected struct {
+		gotlist []*string
+	}
+	tests := []struct {
+		Name     string
+		Input    input
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			gotlist := pointerList(test.Input.input)
+
+			assert.Equal(t, test.Expected.gotlist, gotlist)
+		})
+	}
+}

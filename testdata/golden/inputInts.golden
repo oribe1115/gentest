@@ -1,0 +1,20 @@
+
+func TestInputInts(t *testing.T) {
+
+	type input struct {
+		a int
+		b int
+	}
+
+	tests := []struct {
+		Name  string
+		Input input
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			inputInts(test.Input.a, test.Input.b)
+
+		})
+	}
+}

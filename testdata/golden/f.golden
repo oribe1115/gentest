@@ -1,0 +1,12 @@
+
+func TestF(t *testing.T) {
+
+	tests := []struct{ Name string }{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			f()
+
+		})
+	}
+}

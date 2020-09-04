@@ -1,0 +1,25 @@
+
+func TestMapFunc(t *testing.T) {
+
+	type input struct {
+		input map[int]string
+	}
+	type expected struct {
+		gotmp  map[int]string
+		gotmp2 map[string]error
+	}
+	tests := []struct {
+		Name     string
+		Input    input
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			gotmp, gotmp2 := mapFunc(test.Input.input)
+
+			assert.Equal(t, test.Expected.gotmp, gotmp)
+			assert.Equal(t, test.Expected.gotmp2, gotmp2)
+		})
+	}
+}

@@ -1,0 +1,23 @@
+
+func TestBasicInterface(t *testing.T) {
+
+	type input struct {
+		input interface{ hoge() }
+	}
+	type expected struct {
+		gotin interface{ hoge() }
+	}
+	tests := []struct {
+		Name     string
+		Input    input
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			gotin := basicInterface(test.Input.input)
+
+			assert.Equal(t, test.Expected.gotin, gotin)
+		})
+	}
+}

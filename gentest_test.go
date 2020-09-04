@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/oribe1115/gentest"
-	"github.com/stretchr/testify/assert"
+	"github.com/sebdah/goldie/v2"
 	"golang.org/x/tools/go/analysis/analysistest"
 )
 
@@ -653,7 +653,11 @@ func TestAssignInGoFunc(t *testing.T) {
 			gentest.SetOffsetComent(test.OffsetComment)
 			gentest.SetPrallelMode(test.Parallel)
 			analysistest.Run(t, testdata, gentest.Analyzer, test.TestPackage)
-			assert.Equal(t, test.Expected, buffer.String())
+			// assert.Equal(t, test.Expected, buffer.String())
+			g := goldie.New(t,
+				goldie.WithFixtureDir("testdata/golden"),
+			)
+			g.Assert(t, test.Name, buffer.Bytes())
 		})
 
 	}

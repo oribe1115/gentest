@@ -1,0 +1,15 @@
+
+func TestPointerRecv(t *testing.T) {
+
+	tests := []struct {
+		Name string
+		Use  *d.T
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			test.Use.pointerRecv()
+
+		})
+	}
+}

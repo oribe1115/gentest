@@ -1,0 +1,17 @@
+
+func TestAssignInGoFunc(t *testing.T) {
+
+	tests := []struct {
+		Name        string
+		Use         *e.T
+		UseExpected *e.T
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			test.Use.assignInGoFunc()
+
+			assert.Equal(t, test.UseExpected, test.Use)
+		})
+	}
+}

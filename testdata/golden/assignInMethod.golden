@@ -1,0 +1,15 @@
+
+func TestAssignInMethod(t *testing.T) {
+
+	tests := []struct {
+		Name string
+		Use  *e.T
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			test.Use.assignInMethod()
+
+		})
+	}
+}

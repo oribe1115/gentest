@@ -1,0 +1,15 @@
+
+func TestParallel(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct{ Name string }{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			t.Parallel()
+			t.Cleanup()
+
+			parallel()
+
+		})
+	}
+}

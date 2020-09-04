@@ -1,0 +1,23 @@
+
+func TestPointer(t *testing.T) {
+
+	type input struct {
+		input *string
+	}
+	type expected struct {
+		gotpstring *string
+	}
+	tests := []struct {
+		Name     string
+		Input    input
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			gotpstring := pointer(test.Input.input)
+
+			assert.Equal(t, test.Expected.gotpstring, gotpstring)
+		})
+	}
+}

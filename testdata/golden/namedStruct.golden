@@ -1,0 +1,23 @@
+
+func TestNamedStruct(t *testing.T) {
+
+	type input struct {
+		input context.Context
+	}
+	type expected struct {
+		gotcontext context.Context
+	}
+	tests := []struct {
+		Name     string
+		Input    input
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			gotcontext := namedStruct(test.Input.input)
+
+			assert.Equal(t, test.Expected.gotcontext, gotcontext)
+		})
+	}
+}

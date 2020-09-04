@@ -1,0 +1,23 @@
+
+func TestMyStructFunc(t *testing.T) {
+
+	type input struct {
+		ms b.myStruct
+	}
+	type expected struct {
+		gotmyStruct b.myStruct
+	}
+	tests := []struct {
+		Name     string
+		Input    input
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			gotmyStruct := myStructFunc(test.Input.ms)
+
+			assert.Equal(t, test.Expected.gotmyStruct, gotmyStruct)
+		})
+	}
+}

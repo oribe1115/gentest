@@ -1,0 +1,30 @@
+
+func TestReturnIntError(t *testing.T) {
+
+	type expected struct {
+		gotint   int
+		goterror error
+	}
+	tests := []struct {
+		Name      string
+		Expected  expected
+		WantError bool
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			gotint, goterror := returnIntError()
+
+			if test.WantError {
+				assert.Error(t, goterror)
+				if test.Expected.goterror != nil {
+					assert.EqualError(t, goterror, test.Expected.goterror.String())
+				}
+			} else {
+				assert.NoError(t, goterror)
+			}
+
+			assert.Equal(t, test.Expected.gotint, gotint)
+		})
+	}
+}

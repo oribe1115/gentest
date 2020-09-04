@@ -1,0 +1,23 @@
+
+func TestIntList(t *testing.T) {
+
+	type input struct {
+		list []int
+	}
+	type expected struct {
+		gotintList []int
+	}
+	tests := []struct {
+		Name     string
+		Input    input
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			gotintList := intList(test.Input.list)
+
+			assert.Equal(t, test.Expected.gotintList, gotintList)
+		})
+	}
+}

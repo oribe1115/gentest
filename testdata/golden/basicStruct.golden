@@ -1,0 +1,23 @@
+
+func TestBasicStruct(t *testing.T) {
+
+	type input struct {
+		input struct{ name string }
+	}
+	type expected struct {
+		gotst struct{ name string }
+	}
+	tests := []struct {
+		Name     string
+		Input    input
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			gotst := basicStruct(test.Input.input)
+
+			assert.Equal(t, test.Expected.gotst, gotst)
+		})
+	}
+}

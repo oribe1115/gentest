@@ -1,0 +1,21 @@
+
+func TestReturnInts(t *testing.T) {
+
+	type expected struct {
+		gotint  int
+		gotint2 int
+	}
+	tests := []struct {
+		Name     string
+		Expected expected
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			gotint, gotint2 := returnInts()
+
+			assert.Equal(t, test.Expected.gotint, gotint)
+			assert.Equal(t, test.Expected.gotint2, gotint2)
+		})
+	}
+}
