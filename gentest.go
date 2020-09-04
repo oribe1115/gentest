@@ -449,11 +449,14 @@ func (bf *baseFuncData) setRecvChenged(pass *analysis.Pass) {
 		switch n := n.(type) {
 		case *ast.AssignStmt:
 			for _, expr := range n.Lhs {
-				selExpr, _ := expr.(*ast.SelectorExpr)
-				if selExpr == nil {
-					continue
+				var x *ast.Ident
+				switch expr := expr.(type) {
+				case *ast.SelectorExpr:
+					x, _ = expr.X.(*ast.Ident)
+				case *ast.Ident:
+					x = expr
 				}
-				x, _ := selExpr.X.(*ast.Ident)
+
 				if x == nil {
 					continue
 				}
@@ -464,6 +467,7 @@ func (bf *baseFuncData) setRecvChenged(pass *analysis.Pass) {
 				}
 			}
 		}
+
 		return true
 	})
 

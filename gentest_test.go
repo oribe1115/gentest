@@ -541,6 +541,28 @@ func TestAssgin(t *testing.T) {
 }`,
 		},
 		{
+			Name:          "directly recv changed func",
+			TestPackage:   "e",
+			OffsetComment: "offset_recvChangedDirect",
+			Expected: `
+func TestRecvChangedDirect(t *testing.T) {
+
+	tests := []struct {
+		Name        string
+		Use         *e.T
+		UseExpected *e.T
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			test.Use.recvChangedDirect()
+
+			assert.Equal(t, test.UseExpected, test.Use)
+		})
+	}
+}`,
+		},
+		{
 			Name:          "same type not recv changed func",
 			TestPackage:   "e",
 			OffsetComment: "offset_sameTypeDiffVar",

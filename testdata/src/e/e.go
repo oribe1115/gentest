@@ -11,6 +11,11 @@ func (t *T) assgin() {
 	t.Hoge = "hoge"
 }
 
+// offset_recvChangedDirect
+func (t *T) recvChangedDirect() {
+	t = &T{}
+}
+
 /* -----UseExpectedを生成しない----- */
 
 // offset_sameTypeDiffVar
