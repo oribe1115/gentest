@@ -229,6 +229,9 @@ func typeToVarNames(t types.Type) (typeString string, varName string) {
 	case *types.Pointer:
 		if elem, _ := t.Elem().(*types.Basic); elem != nil {
 			varName = "p" + elem.Name()
+		} else if elem, _ := t.Elem().(*types.Named); elem != nil {
+			typeString, varName = typeToVarNames(elem)
+			typeString = "*" + typeString
 		} else {
 			varName = "p"
 		}
