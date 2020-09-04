@@ -8,7 +8,9 @@ func TestReturnInts(t *testing.T) {
 	tests := []struct {
 		Name     string
 		Expected expected
-	}{}
+	}{
+		// TODO: Add test cases.
+	}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 

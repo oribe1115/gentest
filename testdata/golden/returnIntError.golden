@@ -9,7 +9,9 @@ func TestReturnIntError(t *testing.T) {
 		Name      string
 		Expected  expected
 		WantError bool
-	}{}
+	}{
+		// TODO: Add test cases.
+	}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 

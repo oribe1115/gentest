@@ -398,7 +398,9 @@ func (of *outputField) genTestCasesDef(bf *baseFuncData) {
 	of.TestCasesDef = fmt.Sprintf(
 		`tests := []struct{
 			%s
-		}{}`,
+		}{
+			// TODO: Add test cases.
+		}`,
 		strings.Join(elements, "\n"))
 }
 

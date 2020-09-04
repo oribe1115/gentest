@@ -3,7 +3,9 @@ func TestF(t *testing.T) {
 
 	tests := []struct {
 		Name string
-	}{}
+	}{
+		// TODO: Add test cases.
+	}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 
