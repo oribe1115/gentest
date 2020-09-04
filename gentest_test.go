@@ -560,6 +560,68 @@ func TestSameTypeDiffVar(t *testing.T) {
 	}
 }`,
 		},
+		{
+			Name:          "chenged in called method func",
+			TestPackage:   "e",
+			OffsetComment: "offset_assignInMethod",
+			Expected: `
+func TestAssignInMethod(t *testing.T) {
+
+	tests := []struct {
+		Name string
+		Use  *e.T
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			test.Use.assignInMethod()
+
+		})
+	}
+}`,
+		},
+		{
+			Name:          "chenged in called function func",
+			TestPackage:   "e",
+			OffsetComment: "offset_assignInFunc",
+			Expected: `
+func TestAssignInFunc(t *testing.T) {
+
+	tests := []struct {
+		Name string
+		Use  *e.T
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			test.Use.assignInFunc()
+
+		})
+	}
+}`,
+		},
+		{
+			Name:          "chenged in called go func func",
+			TestPackage:   "e",
+			OffsetComment: "offset_assignInGoFunc",
+			Expected: `
+func TestAssignInGoFunc(t *testing.T) {
+
+	tests := []struct {
+		Name        string
+		Use         *e.T
+		UseExpected *e.T
+	}{}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			test.Use.assignInGoFunc()
+
+			assert.Equal(t, test.UseExpected, test.Use)
+		})
+	}
+}`,
+		},
 	}
 
 	for _, test := range tests {
