@@ -5,7 +5,7 @@ func TestFunction(t *testing.T) {
 		input func(i int) string
 	}
 	type expected struct {
-		gotfn func(i int) string
+		gotFn func(i int) string
 	}
 	tests := []struct {
 		Name     string
@@ -17,9 +17,9 @@ func TestFunction(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 
-			gotfn := function(test.Input.input)
+			gotFn := function(test.Input.input)
 
-			assert.Equal(t, test.Expected.gotfn, gotfn)
+			assert.Equal(t, test.Expected.gotFn, gotFn)
 		})
 	}
 }

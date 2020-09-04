@@ -277,7 +277,9 @@ func tupleToVarFields(tuple *types.Tuple, prefix string) ([]*varField, int) {
 			name = varName
 		}
 
-		name = prefix + name
+		if prefix != "" {
+			name = prefix + startWithUpper(name)
+		}
 
 		if count, exist := nameMap[name]; exist {
 			name += strconv.Itoa(count + 1)

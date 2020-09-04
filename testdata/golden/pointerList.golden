@@ -5,7 +5,7 @@ func TestPointerList(t *testing.T) {
 		input []*string
 	}
 	type expected struct {
-		gotlist []*string
+		gotList []*string
 	}
 	tests := []struct {
 		Name     string
@@ -17,9 +17,9 @@ func TestPointerList(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 
-			gotlist := pointerList(test.Input.input)
+			gotList := pointerList(test.Input.input)
 
-			assert.Equal(t, test.Expected.gotlist, gotlist)
+			assert.Equal(t, test.Expected.gotList, gotList)
 		})
 	}
 }

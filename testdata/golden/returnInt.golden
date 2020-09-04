@@ -2,7 +2,7 @@
 func TestReturnInt(t *testing.T) {
 
 	type expected struct {
-		gotint int
+		gotInt int
 	}
 	tests := []struct {
 		Name     string
@@ -13,9 +13,9 @@ func TestReturnInt(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 
-			gotint := returnInt()
+			gotInt := returnInt()
 
-			assert.Equal(t, test.Expected.gotint, gotint)
+			assert.Equal(t, test.Expected.gotInt, gotInt)
 		})
 	}
 }

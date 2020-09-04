@@ -5,7 +5,7 @@ func TestPointer(t *testing.T) {
 		input *string
 	}
 	type expected struct {
-		gotpstring *string
+		gotPstring *string
 	}
 	tests := []struct {
 		Name     string
@@ -17,9 +17,9 @@ func TestPointer(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 
-			gotpstring := pointer(test.Input.input)
+			gotPstring := pointer(test.Input.input)
 
-			assert.Equal(t, test.Expected.gotpstring, gotpstring)
+			assert.Equal(t, test.Expected.gotPstring, gotPstring)
 		})
 	}
 }

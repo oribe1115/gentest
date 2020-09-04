@@ -5,8 +5,8 @@ func TestMapFunc(t *testing.T) {
 		input map[int]string
 	}
 	type expected struct {
-		gotmp  map[int]string
-		gotmp2 map[string]error
+		gotMp  map[int]string
+		gotMp2 map[string]error
 	}
 	tests := []struct {
 		Name     string
@@ -18,10 +18,10 @@ func TestMapFunc(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 
-			gotmp, gotmp2 := mapFunc(test.Input.input)
+			gotMp, gotMp2 := mapFunc(test.Input.input)
 
-			assert.Equal(t, test.Expected.gotmp, gotmp)
-			assert.Equal(t, test.Expected.gotmp2, gotmp2)
+			assert.Equal(t, test.Expected.gotMp, gotMp)
+			assert.Equal(t, test.Expected.gotMp2, gotMp2)
 		})
 	}
 }

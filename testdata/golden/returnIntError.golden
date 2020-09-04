@@ -2,8 +2,8 @@
 func TestReturnIntError(t *testing.T) {
 
 	type expected struct {
-		gotint   int
-		goterror error
+		gotInt   int
+		gotError error
 	}
 	tests := []struct {
 		Name      string
@@ -15,18 +15,18 @@ func TestReturnIntError(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 
-			gotint, goterror := returnIntError()
+			gotInt, gotError := returnIntError()
 
 			if test.WantError {
-				assert.Error(t, goterror)
-				if test.Expected.goterror != nil {
-					assert.EqualError(t, goterror, test.Expected.goterror.String())
+				assert.Error(t, gotError)
+				if test.Expected.gotError != nil {
+					assert.EqualError(t, gotError, test.Expected.gotError.String())
 				}
 			} else {
-				assert.NoError(t, goterror)
+				assert.NoError(t, gotError)
 			}
 
-			assert.Equal(t, test.Expected.gotint, gotint)
+			assert.Equal(t, test.Expected.gotInt, gotInt)
 		})
 	}
 }

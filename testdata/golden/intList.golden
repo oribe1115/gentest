@@ -5,7 +5,7 @@ func TestIntList(t *testing.T) {
 		list []int
 	}
 	type expected struct {
-		gotintList []int
+		gotIntList []int
 	}
 	tests := []struct {
 		Name     string
@@ -17,9 +17,9 @@ func TestIntList(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 
-			gotintList := intList(test.Input.list)
+			gotIntList := intList(test.Input.list)
 
-			assert.Equal(t, test.Expected.gotintList, gotintList)
+			assert.Equal(t, test.Expected.gotIntList, gotIntList)
 		})
 	}
 }

@@ -5,7 +5,7 @@ func TestNamedStruct(t *testing.T) {
 		input context.Context
 	}
 	type expected struct {
-		gotcontext context.Context
+		gotContext context.Context
 	}
 	tests := []struct {
 		Name     string
@@ -17,9 +17,9 @@ func TestNamedStruct(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 
-			gotcontext := namedStruct(test.Input.input)
+			gotContext := namedStruct(test.Input.input)
 
-			assert.Equal(t, test.Expected.gotcontext, gotcontext)
+			assert.Equal(t, test.Expected.gotContext, gotContext)
 		})
 	}
 }

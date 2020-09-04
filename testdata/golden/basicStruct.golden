@@ -5,7 +5,7 @@ func TestBasicStruct(t *testing.T) {
 		input struct{ name string }
 	}
 	type expected struct {
-		gotst struct{ name string }
+		gotSt struct{ name string }
 	}
 	tests := []struct {
 		Name     string
@@ -17,9 +17,9 @@ func TestBasicStruct(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 
-			gotst := basicStruct(test.Input.input)
+			gotSt := basicStruct(test.Input.input)
 
-			assert.Equal(t, test.Expected.gotst, gotst)
+			assert.Equal(t, test.Expected.gotSt, gotSt)
 		})
 	}
 }

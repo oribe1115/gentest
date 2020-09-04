@@ -5,7 +5,7 @@ func TestNamedInterface(t *testing.T) {
 		input http.Handler
 	}
 	type expected struct {
-		gothandler http.Handler
+		gotHandler http.Handler
 	}
 	tests := []struct {
 		Name     string
@@ -17,9 +17,9 @@ func TestNamedInterface(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 
-			gothandler := namedInterface(test.Input.input)
+			gotHandler := namedInterface(test.Input.input)
 
-			assert.Equal(t, test.Expected.gothandler, gothandler)
+			assert.Equal(t, test.Expected.gotHandler, gotHandler)
 		})
 	}
 }

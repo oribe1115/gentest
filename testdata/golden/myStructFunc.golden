@@ -5,7 +5,7 @@ func TestMyStructFunc(t *testing.T) {
 		ms b.myStruct
 	}
 	type expected struct {
-		gotmyStruct b.myStruct
+		gotMyStruct b.myStruct
 	}
 	tests := []struct {
 		Name     string
@@ -17,9 +17,9 @@ func TestMyStructFunc(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 
-			gotmyStruct := myStructFunc(test.Input.ms)
+			gotMyStruct := myStructFunc(test.Input.ms)
 
-			assert.Equal(t, test.Expected.gotmyStruct, gotmyStruct)
+			assert.Equal(t, test.Expected.gotMyStruct, gotMyStruct)
 		})
 	}
 }
