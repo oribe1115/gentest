@@ -12,6 +12,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/pkg/errors"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
 )
@@ -103,7 +104,10 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	outputTestCode(of)
+	err = outputTestCode(of)
+	if err != nil {
+		return nil, err
+	}
 
 	return nil, nil
 }
@@ -419,17 +423,22 @@ func {{.TestFuncName}}(t *testing.T){
 
 	t, err := template.New("base").Parse(testCodeTemplate)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "func outputTestCode faild with parse template")
 	}
 	buffer := &bytes.Buffer{}
 	err = t.Execute(buffer, field)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "func outputTestCode faild with execute")
 	}
 	result, err := format.Source([]byte(buffer.Bytes()))
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "func outputTestCode faild with format generared test code\n%s\n", buffer.String())
 	}
-	fprint(string(result))
+
+	output := string(result)
+	if output == "" {
+		return fmt.Errorf("error at outputTestCode")
+	}
+	fprint(output)
 	return nil
 }
