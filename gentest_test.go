@@ -149,6 +149,26 @@ func TestAnalyzer(t *testing.T) {
 			TestPackage:   "f",
 			OffsetComment: "offset_namedResults",
 		},
+		{
+			Name:          "offsetFunc",
+			TestPackage:   "g",
+			OffsetComment: "offset_offsetFunc_beforeDec",
+		},
+		{
+			Name:          "offsetFunc",
+			TestPackage:   "g",
+			OffsetComment: "offset_offsetFunc_beforeName",
+		},
+		{
+			Name:          "offsetFunc",
+			TestPackage:   "g",
+			OffsetComment: "offset_offsetFunc_afterName",
+		},
+		{
+			Name:          "offsetFunc",
+			TestPackage:   "g",
+			OffsetComment: "offset_offsetFunc_inBrackets",
+		},
 	}
 
 	g := goldie.New(t,

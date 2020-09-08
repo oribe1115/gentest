@@ -1,0 +1,30 @@
+
+func TestOffsetFunc(t *testing.T) {
+
+	type input struct {
+		i int
+		j int
+	}
+	type expected struct {
+		gotInt  int
+		gotInt2 int
+	}
+	tests := []struct {
+		Name     string
+		Input    input
+		Expected expected
+	}{
+		// TODO: Add test cases.
+	}
+
+	for _, test := range tests {
+		test := test
+		t.Run(test.Name, func(t *testing.T) {
+
+			gotInt, gotInt2 := offsetFunc(test.Input.i, test.Input.j)
+
+			assert.Equal(t, test.Expected.gotInt, gotInt)
+			assert.Equal(t, test.Expected.gotInt2, gotInt2)
+		})
+	}
+}
