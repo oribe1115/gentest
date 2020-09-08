@@ -119,14 +119,9 @@ func run(pass *analysis.Pass) (interface{}, error) {
 func getOffsetByComment(pass *analysis.Pass, targetComment string) (int, error) {
 	targetComment += "\n"
 	for _, file := range pass.Files {
-		for _, decl := range file.Decls {
-			funcDecl, _ := decl.(*ast.FuncDecl)
-			if funcDecl == nil || funcDecl.Doc == nil {
-				continue
-			}
-
-			if funcDecl.Doc.Text() == targetComment {
-				return pass.Fset.Position(funcDecl.Name.Pos()).Offset, nil
+		for _, cg := range file.Comments {
+			if cg.Text() == targetComment {
+				return pass.Fset.Position(cg.End()).Offset + 1, nil
 			}
 		}
 	}
@@ -142,8 +137,8 @@ func findTargetFunc(pass *analysis.Pass) (*ast.FuncDecl, error) {
 				continue
 			}
 
-			startOffset := pass.Fset.Position(funcDecl.Name.Pos()).Offset
-			endOffset := pass.Fset.Position(funcDecl.Name.End()).Offset
+			startOffset := pass.Fset.Position(funcDecl.Type.Func).Offset
+			endOffset := pass.Fset.Position(funcDecl.Body.Rbrace).Offset
 
 			if startOffset <= offset && offset <= endOffset {
 				return funcDecl, nil
