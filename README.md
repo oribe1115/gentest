@@ -1,6 +1,7 @@
 # gentest
 
 `gentest` generate test code template for function
+Generated test code use [testify](github.com/stretchr/testify)
 
 ## Installation
 
@@ -10,15 +11,8 @@ $ go get -u github.com/oribe1115/gentest/cmd/gentest
 
 ## Example
 
-```go
-package main
-
-import "fmt"
-
-func main() {
-	greeting := hello("world")
-	fmt.Println(greeting)
-}
+```go:sample.go
+package sample
 
 func hello(s string) string {
 	return "Hello " + s
@@ -26,7 +20,7 @@ func hello(s string) string {
 ```
 
 ```sh
-$ go vet -vettool=`which gentest` -gentest.offset=101 main.go
+$ go vet -vettool=`which gentest` -gentest.offset=21 sample.go
 
 func TestHello(t *testing.T) {
 
@@ -68,15 +62,8 @@ Optional flag
 If parallel is `true`, generated test code contains t.Parallel and t.Cleanup
 Default: `false`
 
-```go
-package main
-
-import "fmt"
-
-func main() {
-	greeting := hello("world")
-	fmt.Println(greeting)
-}
+```go:sample.go
+package sample
 
 func hello(s string) string {
 	return "Hello " + s
@@ -84,7 +71,7 @@ func hello(s string) string {
 ```
 
 ```sh
-go vet -vettool=`which gentest` -gentest.offset=101 -gentest.parallel=true main.go
+go vet -vettool=`which gentest` -gentest.offset=21 -gentest.parallel=true sample.go
 
 func TestHello(t *testing.T) {
         t.Parallel()
@@ -121,16 +108,10 @@ func TestHello(t *testing.T) {
 `gentest` generate best test code template for target function
 
 ### Retrun values contin error
-```go
-package main
+```go:sample.go
+package sample
 
-import (
-	"errors"
-)
-
-func main() {
-	_, _ = errFunc()
-}
+import "errors"
 
 func errFunc() (string, error) {
 	return "", errors.New("error")
@@ -138,7 +119,7 @@ func errFunc() (string, error) {
 ```
 
 ```sh
-$ go vet -vettool=`which gentest` -gentest.offset=76 main.go
+$ go vet -vettool=`which gentest` -gentest.offset=40 sample.go
 
 func TestErrFunc(t *testing.T) {
 
@@ -176,18 +157,11 @@ func TestErrFunc(t *testing.T) {
 ```
 
 ### Target function is method
-```go
-package main
+```go:sample.go
+package sample
 
 type T struct {
 	Hoge string
-}
-
-func main() {
-	t := T{
-		Hoge: "hoge",
-	}
-	t.Method()
 }
 
 func (t T) Method() string {
@@ -196,7 +170,7 @@ func (t T) Method() string {
 ```
 
 ```sh
-$ go vet -vettool=`which gentest` -gentest.offset=114 main.go
+$ go vet -vettool=`which gentest` -gentest.offset=114 sample.go
 
 func TestT_Method(t *testing.T) {
 
@@ -205,7 +179,7 @@ func TestT_Method(t *testing.T) {
         }
         tests := []struct {
                 Name     string
-                Use      main.T
+                Use      sample.T
                 Expected expected
         }{
                 // TODO: Add test cases.
@@ -224,28 +198,21 @@ func TestT_Method(t *testing.T) {
 ```
 
 ### Method change receiver field
-```go
-package main
+```go:sample.go
+package sample
 
 type T struct {
 	Hoge string
 }
 
-func main() {
-	t := &T{
-		Hoge: "hoge",
-	}
-	t.Method()
-}
-
 func (t *T) Method() string {
-	t.Hoge = "fuga"
+	t.Hoge = "hoge"
 	return t.Hoge
 }
 ```
 
 ```sh
-$ go vet -vettool=`which gentest` -gentest.offset=116 main.go
+$ go vet -vettool=`which gentest` -gentest.offset=116 sample.go
 
 func TestT_Method(t *testing.T) {
 
@@ -254,9 +221,9 @@ func TestT_Method(t *testing.T) {
         }
         tests := []struct {
                 Name        string
-                Use         *main.T
+                Use         *sample.T
                 Expected    expected
-                UseExpected *main.T
+                UseExpected *sample.T
         }{
                 // TODO: Add test cases.
         }
