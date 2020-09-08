@@ -1,7 +1,7 @@
 # gentest
 
-`gentest` generate test code template for function
-Generated test code use [testify](github.com/stretchr/testify)
+`gentest` generates test code template for function
+Generated test code uses [testify](github.com/stretchr/testify)
 
 ## Installation
 
@@ -105,7 +105,7 @@ func TestHello(t *testing.T) {
 ```
 
 ## Pattern
-`gentest` generate best test code template for target function
+`gentest` generates best test code template for target function
 
 ### Retrun values contin error
 ```go:sample.go
