@@ -1,5 +1,5 @@
 
-func TestAssgin(t *testing.T) {
+func TestT_assgin(t *testing.T) {
 
 	tests := []struct {
 		Name        string

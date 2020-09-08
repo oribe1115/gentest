@@ -157,7 +157,14 @@ func startWithUpper(base string) string {
 }
 
 func (of *outputField) genTestFuncName(bf *baseFuncData) {
-	of.TestFuncName = "Test" + startWithUpper(bf.FuncDecl.Name.Name)
+	var funcName string
+	if bf.Recv != nil {
+		funcName = fmt.Sprintf("Test%s_%s", startWithUpper(bf.Recv.Name), bf.FuncDecl.Name.Name)
+	} else {
+		funcName = fmt.Sprintf("Test%s", startWithUpper(bf.FuncDecl.Name.Name))
+	}
+
+	of.TestFuncName = funcName
 }
 
 func (of *outputField) genExecBaseCode(bf *baseFuncData) {

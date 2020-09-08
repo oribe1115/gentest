@@ -1,5 +1,5 @@
 
-func TestAssignInMethod(t *testing.T) {
+func TestT_assignInMethod(t *testing.T) {
 
 	tests := []struct {
 		Name string
