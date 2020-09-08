@@ -443,7 +443,9 @@ func (of *outputField) genParalles(bf *baseFuncData) {
 	}
 
 	of.Parallel = "t.Parallel()"
-	of.Cleanup = "t.Cleanup()\n"
+	of.Cleanup = `t.Cleanup(
+			// TODO: Add function.
+		)`
 }
 
 func (bf *baseFuncData) setRecvChenged(pass *analysis.Pass) {

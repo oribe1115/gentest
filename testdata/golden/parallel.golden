@@ -12,8 +12,9 @@ func TestParallel(t *testing.T) {
 		test := test
 		t.Run(test.Name, func(t *testing.T) {
 			t.Parallel()
-			t.Cleanup()
-
+			t.Cleanup(
+			// TODO: Add function.
+			)
 			parallel()
 
 		})
