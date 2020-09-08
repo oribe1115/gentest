@@ -45,6 +45,7 @@ func TestHello(t *testing.T) {
         }
 
         for _, test := range tests {
+                test := test
                 t.Run(test.Name, func(t *testing.T) {
 
                         gotString := hello(test.Input.s)
@@ -102,10 +103,12 @@ func TestHello(t *testing.T) {
         }
 
         for _, test := range tests {
+                test := test
                 t.Run(test.Name, func(t *testing.T) {
                         t.Parallel()
-                        t.Cleanup()
-
+                        t.Cleanup(
+                        // TODO: Add function.
+                        )
                         gotString := hello(test.Input.s)
 
                         assert.Equal(t, test.Expected.gotString, gotString)
@@ -152,6 +155,7 @@ func TestErrFunc(t *testing.T) {
         }
 
         for _, test := range tests {
+                test := test
                 t.Run(test.Name, func(t *testing.T) {
 
                         gotString, gotError := errFunc()
@@ -183,18 +187,18 @@ func main() {
 	t := T{
 		Hoge: "hoge",
 	}
-	t.method()
+	t.Method()
 }
 
-func (t T) method() string {
+func (t T) Method() string {
 	return t.Hoge
 }
 ```
 
 ```sh
-go vet -vettool=`which gentest` -gentest.offset=114 main.go
+$ go vet -vettool=`which gentest` -gentest.offset=114 main.go
 
-func TestMethod(t *testing.T) {
+func TestT_Method(t *testing.T) {
 
         type expected struct {
                 gotString string
@@ -208,9 +212,10 @@ func TestMethod(t *testing.T) {
         }
 
         for _, test := range tests {
+                test := test
                 t.Run(test.Name, func(t *testing.T) {
 
-                        gotString := test.Use.method()
+                        gotString := test.Use.Method()
 
                         assert.Equal(t, test.Expected.gotString, gotString)
                 })
@@ -230,19 +235,19 @@ func main() {
 	t := &T{
 		Hoge: "hoge",
 	}
-	t.method()
+	t.Method()
 }
 
-func (t *T) method() string {
+func (t *T) Method() string {
 	t.Hoge = "fuga"
 	return t.Hoge
 }
 ```
 
 ```sh
-go vet -vettool=`which gentest` -gentest.offset=116 main.go
+$ go vet -vettool=`which gentest` -gentest.offset=116 main.go
 
-func TestMethod(t *testing.T) {
+func TestT_Method(t *testing.T) {
 
         type expected struct {
                 gotString string
@@ -257,9 +262,10 @@ func TestMethod(t *testing.T) {
         }
 
         for _, test := range tests {
+                test := test
                 t.Run(test.Name, func(t *testing.T) {
 
-                        gotString := test.Use.method()
+                        gotString := test.Use.Method()
 
                         assert.Equal(t, test.Expected.gotString, gotString)
                         assert.Equal(t, test.UseExpected, test.Use)
